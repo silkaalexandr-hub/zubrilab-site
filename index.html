@@ -59,12 +59,22 @@ h2{font-family:'PT Serif',Georgia,serif;font-size:34px;line-height:1.15;margin:0
 .price .sum{font-size:34px;font-weight:700}
 .price .card.main{border:2px solid var(--ink)}
 .note{color:var(--muted);font-size:15px;margin-top:16px;max-width:720px}
+.facts{display:grid;gap:14px}
+.fact{display:flex;gap:20px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px}
+.fact .num{flex-shrink:0;width:112px;font-family:'PT Serif',Georgia,serif;font-weight:700;font-size:40px;line-height:1;color:var(--ink)}
+.fact .num small{display:block;font-family:Onest,sans-serif;font-weight:500;font-size:14px;color:var(--muted);margin-top:6px}
+.fact strong{font-size:19px}
+.fact p{margin:6px 0 8px;color:var(--ink2);font-size:16px}
+.src{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 footer{border-top:1px solid var(--line);padding:32px 0 44px;color:var(--muted);font-size:14px}
 footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
 @media (max-width:820px){
   .hero{grid-template-columns:1fr;gap:36px;padding-top:16px}
   h1{font-size:38px}
-  .grid3,.price{grid-template-columns:1fr}
+  .grid3,.grid2,.price{grid-template-columns:1fr}
+  .fact{flex-direction:column;gap:10px}
+  .fact .num{width:auto}
 }
 </style>
 </head>
@@ -104,6 +114,22 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
       <div class="card"><h3>Семьи слов</h3><p>Однокоренные слова показываются рядом: выучил одно — узнаёшь ещё два-три.</p></div>
       <div class="card"><h3>Самое нужное</h3><p>5000 слов, отобранных по частоте. Сначала те, что встречаются в речи и текстах чаще всего.</p></div>
       <div class="card"><h3>Видно прогресс</h3><p>Сколько выучено, что на проверке сегодня, статистика по дням.</p></div>
+    </div>
+  </section>
+
+  <section id="science">
+    <h2>Почему этот способ работает</h2>
+    <p class="lead" style="max-width:720px">Зубрила не изобретает новую методику. Тренажёр собран из приёмов, которые хорошо проверены в исследованиях памяти и изучения иностранных слов.</p>
+    <div class="facts">
+      <div class="fact"><span class="num">80%<small>против 35%</small></span><div><strong>Вспоминаешь сам, а не перечитываешь.</strong><p>В эксперименте со словами суахили те, кто продолжал проверять себя, через неделю помнили около 80% слов. Те, кто бросал проверку после первого верного ответа, — около 35%.</p><span class="src">Karpicke &amp; Roediger, Science, 2008</span></div></div>
+      <div class="fact"><span class="num">90%</span><div><strong>Повторы растянуты во времени.</strong><p>Интервальное повторение — один из самых надёжных эффектов в науке о памяти. Распределённые повторения работали лучше зубрёжки подряд у 90% участников, хотя 72% из них были уверены в обратном.</p><span class="src">Kornell, 2009</span></div></div>
+      <div class="fact"><span class="num" aria-hidden="true">10×</span><div><strong>Сначала до порога, потом переучивание.</strong><p>Слово сначала 10 раз отвечаешь верно, потом возвращаешься к нему в отдельных подходах и через 7, 14, 28 дней. Этот приём называют повторным переучиванием, он даёт одно из самых прочных запоминаний.</p><span class="src">Rawson &amp; Dunlosky; Educational Psychology Review, 2023; Landauer &amp; Bjork, 1978</span></div></div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><h3>От узнавания к вписыванию</h3><p>Сначала узнаёшь слово среди вариантов, потом вписываешь сам. Эта «полезная трудность» закрепляет слово надёжнее.</p></div>
+      <div class="card"><h3>Ошибка исправляется сразу</h3><p>Тренажёр мгновенно показывает правильный ответ, объясняет, с чем ты перепутал, и возвращает слово на повтор.</p></div>
+      <div class="card"><h3>Похожие слова — порознь</h3><p>Однокоренные и близкие по смыслу слова, выученные вместе, мешают друг другу. Поэтому тренажёр разводит их по разным подходам.</p><span class="src">Nation; Nakata &amp; Suzuki, SSLA, 2019</span></div>
+      <div class="card"><h3>Сначала самые нужные</h3><p>Слова идут по частоте. Несколько тысяч самых частых слов покрывают большую часть обычного текста, поэтому каждое новое слово даёт максимум понимания.</p><span class="src">Nation</span></div>
     </div>
   </section>
 
