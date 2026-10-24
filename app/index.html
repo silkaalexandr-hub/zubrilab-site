@@ -4,11 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBF8F2">
-<meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Зубрила — 5000 английских слов</title>
+<title>Зубрила — 5000 самых употребительных английских слов</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=PT+Serif:ital,wght@0,700;1,400&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 /* Layout: progress headline + today line on top, one study card, daily chart, word-list tools folded below */
@@ -522,7 +521,7 @@ function showPaywall(){
     (expired?'':'<div class="steps3"><div><span class="d">1</span><span><b>Сегодня</b>Полный доступ ко всему словарю</span></div><div><span class="d">5</span><span><b>5-й день</b>Напомним, что пробный период заканчивается</span></div><div><span class="d">8</span><span><b>8-й день</b>Списание 199 ₽ в месяц, если не отменишь</span></div></div>')+
     '<button class="btn primary" id="btnTrial">'+(expired?'Подписка 199 ₽ в месяц':'Начать 7 дней бесплатно')+'</button>'+
     '<p style="font-size:.85rem;text-align:center">'+(expired?'Отменить можно в любой момент.':'Затем 199 ₽ в месяц. Отменить можно в любой момент до конца пробного периода — ничего не спишется.')+'</p>'+
-    '<button class="price2" id="btnLife"><span><strong>Навсегда</strong><br><small style="color:var(--muted)">Один платёж, без подписки</small></span><strong>490 ₽</strong></button>'+
+    '<button class="price2" id="btnLife"><span><strong>Навсегда</strong><br><small style="color:var(--muted)">Один платёж, бессрочный доступ</small></span><strong>490 ₽</strong></button>'+
     '<div class="testnote">Тестовая версия: оплата ещё не подключена, кнопки открывают доступ без списания денег.</div>'+
     '<p style="font-size:.8rem;text-align:center">Оформляя подписку, ты принимаешь <a href="/oferta.html">условия оферты</a>.</p></div>';
   const go=v=>{const a=access();Object.assign(a,v);LS.set('zb_access',JSON.stringify(a));renderTrial();newSession()};
