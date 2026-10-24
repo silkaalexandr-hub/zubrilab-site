@@ -511,7 +511,7 @@ function saveAccess(a){LS.set('zb_access',JSON.stringify(a))}
 function accessActive(){const a=access();if(!a.plan)return false;if(a.plan==='life')return true;return !!(a.exp&&Date.now()<a.exp)}
 function trialLeft(){const a=access();if(a.plan!=='trial'||!a.until)return null;return Math.max(0,Math.ceil((a.until-Date.now())/86400000))}
 function renderTrial(){const p=$('trialPill');const d=trialLeft();if(d!=null&&d>0){p.hidden=false;p.textContent='Пробный период: '+d+' дн.'}else p.hidden=true}
-function needPaywall(){return LS.get('zb_demo_done')==='1'&&!accessActive()}
+function needPaywall(){if(accessActive())return false;if(/^#buy/.test(location.hash))return true;return LS.get('zb_demo_done')==='1'}
 async function checkAccess(email){
   const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
   if(!r.ok)throw new Error('check '+r.status);
@@ -553,7 +553,7 @@ async function paySub(email){
 }
 function showPaywall(){
   const a=access(), expired=!!a.email;
-  $('mode').textContent=expired?'Доступ закончился':'Демо-урок пройден';$('mode').className='mode rev';
+  $('mode').textContent=expired?'Доступ закончился':(LS.get('zb_demo_done')==='1'?'Демо-урок пройден':'Полный доступ');$('mode').className='mode rev';
   $('cardNum').textContent='';$('wordCount').textContent='';$('pips').innerHTML='';$('sbar').style.width='100%';
   $('answerArea').innerHTML='';$('verdict').textContent='';
   let n=0;for(const k in W)n++;
@@ -577,6 +577,7 @@ function showPaywall(){
   const run=async fn=>{const e=getEmail();if(!e)return;busy(true);try{await fn(e);await after(e)}catch(err){pm(err.message==='widget'?'Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.':'Оплата не прошла или была отменена.')}finally{busy(false)}};
   $('btnTrial').onclick=()=>run(expired?paySub:payTrial);
   $('btnLife').onclick=()=>run(payLife);
+  if(location.hash==='#buy-life'){$('btnLife').scrollIntoView({block:'center'});$('btnLife').style.outline='3px solid var(--mustard)';history.replaceState(null,'',location.pathname)}
   $('btnRestore').onclick=async()=>{const e=getEmail();if(!e)return;busy(true);try{await after(e,1)}finally{busy(false)}};
 }
 function newSession(){
