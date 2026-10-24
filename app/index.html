@@ -508,12 +508,13 @@ const CP_PUBLIC_ID='pk_7f712dd7d48796ce7d6c9a655dd57';
 const PRICE_SUB=199, PRICE_LIFE=490;
 function access(){try{return JSON.parse(LS.get('zb_access')||'{}')||{}}catch(e){return{}}}
 function saveAccess(a){LS.set('zb_access',JSON.stringify(a))}
+function deviceId(){let d=LS.get('zb_id');if(!d){d='d_'+Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>b.toString(16).padStart(2,'0')).join('');LS.set('zb_id',d)}return d}
 function accessActive(){const a=access();if(!a.plan)return false;if(a.plan==='life')return true;return !!(a.exp&&Date.now()<a.exp)}
 function trialLeft(){const a=access();if(a.plan!=='trial'||!a.until)return null;return Math.max(0,Math.ceil((a.until-Date.now())/86400000))}
 function renderTrial(){const p=$('trialPill');const d=trialLeft();if(d!=null&&d>0){p.hidden=false;p.textContent='Пробный период: '+d+' дн.'}else p.hidden=true}
 function needPaywall(){if(accessActive())return false;if(/^#buy/.test(location.hash))return true;return LS.get('zb_demo_done')==='1'}
 async function checkAccess(email){
-  const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+  const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:email})});
   if(!r.ok)throw new Error('check '+r.status);
   const j=await r.json();
   if(j.active){saveAccess({email,plan:j.plan,until:j.until,token:j.token,exp:Date.now()+7*86400000})}
@@ -521,34 +522,35 @@ async function checkAccess(email){
   return j;
 }
 /* тихое обновление доступа при запуске; без сети доступ сохраняется до 7 дней */
+window.addEventListener('hashchange',()=>{if(/^#buy/.test(location.hash)&&!accessActive())showPaywall()});
 (function(){const a=access();if(a.email&&a.plan!=='life'&&navigator.onLine!==false){checkAccess(a.email).then(renderTrial).catch(()=>{})}})();
 let cpLoaded=null;
 function loadCP(){if(window.cp)return Promise.resolve();if(cpLoaded)return cpLoaded;
   cpLoaded=new Promise((ok,bad)=>{const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>{cpLoaded=null;bad(new Error('widget'))};document.head.appendChild(s)});return cpLoaded}
-function receipt(label,price,email){return{Items:[{label,price,quantity:1,amount:price,vat:null,method:4,object:4}],taxationSystem:1,email,isBso:false,amounts:{electronic:price}}}
+function receipt(label,price){return{Items:[{label,price,quantity:1,amount:price,vat:null,method:4,object:4}],taxationSystem:1,isBso:false,amounts:{electronic:price}}}
 async function payTrial(email){
   await loadCP();
   const start=new Date(Date.now()+7*86400000).toISOString();
   return new Promise((ok,bad)=>{new cp.CloudPayments({language:'ru-RU'}).pay('auth',{
     publicId:CP_PUBLIC_ID,description:'Зубрила: проверка карты для пробного периода (7 дней бесплатно, затем 199 ₽/мес)',
-    amount:1,currency:'RUB',accountId:email,email,skin:'classic',
-    data:{CloudPayments:{recurrent:{interval:'Month',period:1,amount:PRICE_SUB,startDate:start,customerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB,email)}}}
+    amount:1,currency:'RUB',accountId:email,requireEmail:true,skin:'classic',
+    data:{CloudPayments:{recurrent:{interval:'Month',period:1,amount:PRICE_SUB,startDate:start,customerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB)}}}
   },{onSuccess:ok,onFail:(r)=>bad(new Error(r||'fail'))})});
 }
 async function payLife(email){
   await loadCP();
   return new Promise((ok,bad)=>{new cp.CloudPayments({language:'ru-RU'}).pay('charge',{
     publicId:CP_PUBLIC_ID,description:'Зубрила: доступ навсегда',amount:PRICE_LIFE,currency:'RUB',
-    invoiceId:'life:'+email,accountId:email,email,skin:'classic',
-    data:{CloudPayments:{CustomerReceipt:receipt('Доступ к «Зубриле» навсегда',PRICE_LIFE,email)}}
+    invoiceId:'life:'+email,accountId:email,requireEmail:true,skin:'classic',
+    data:{CloudPayments:{CustomerReceipt:receipt('Доступ к «Зубриле» навсегда',PRICE_LIFE)}}
   },{onSuccess:ok,onFail:(r)=>bad(new Error(r||'fail'))})});
 }
 async function paySub(email){
   await loadCP();
   return new Promise((ok,bad)=>{new cp.CloudPayments({language:'ru-RU'}).pay('charge',{
-    publicId:CP_PUBLIC_ID,description:'Зубрила: подписка на месяц',amount:PRICE_SUB,currency:'RUB',accountId:email,email,skin:'classic',
-    data:{CloudPayments:{CustomerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB,email),
-      recurrent:{interval:'Month',period:1,amount:PRICE_SUB,customerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB,email)}}}
+    publicId:CP_PUBLIC_ID,description:'Зубрила: подписка на месяц',amount:PRICE_SUB,currency:'RUB',accountId:email,requireEmail:true,skin:'classic',
+    data:{CloudPayments:{CustomerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB),
+      recurrent:{interval:'Month',period:1,amount:PRICE_SUB,customerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB)}}}
   },{onSuccess:ok,onFail:(r)=>bad(new Error(r||'fail'))})});
 }
 function showPaywall(){
@@ -561,24 +563,20 @@ function showPaywall(){
     '<h2>'+(expired?n+' слов уже в работе — не бросай их':'Продолжи: 7 дней бесплатно')+'</h2>'+
     '<p>'+(expired?'Прогресс сохранён. Продли доступ и продолжай с того же места.':'Все 5000 слов, примеры и семьи слов. Через неделю — первая проверка: увидишь, что слова не забылись.')+'</p>'+
     (expired?'':'<div class="steps3"><div><span class="d">1</span><span><b>Сегодня</b>Полный доступ ко всему словарю</span></div><div><span class="d">5</span><span><b>5-й день</b>Напомним, что пробный период заканчивается</span></div><div><span class="d">8</span><span><b>8-й день</b>Списание 199 ₽ в месяц, если не отменишь</span></div></div>')+
-    '<label for="payEmail" style="font-size:.85rem;font-weight:600;color:var(--muted)">Электронная почта — для чека и восстановления доступа</label>'+
-    '<input class="typein" id="payEmail" type="email" inputmode="email" autocomplete="email" placeholder="name@mail.ru" style="font-family:var(--f-body);font-weight:500;text-align:left">'+
     '<button class="btn primary" id="btnTrial">'+(expired?'Подписка 199 ₽ в месяц':'Начать 7 дней бесплатно')+'</button>'+
     '<p style="font-size:.85rem;text-align:center">'+(expired?'Отменить можно в любой момент.':'Для проверки карты заблокируем 1 ₽ и вернём. Затем 199 ₽ в месяц. Отменить можно в любой момент до конца пробного периода — ничего не спишется.')+'</p>'+
     '<button class="price2" id="btnLife"><span><strong>Навсегда</strong><br><small style="color:var(--muted)">Один платёж, бессрочный доступ</small></span><strong>490 ₽</strong></button>'+
-    '<button class="btn" id="btnRestore">Я уже оплатил — восстановить доступ</button>'+
+    '<p style="font-size:.85rem;text-align:center">Сменил телефон? Напиши на <a href="mailto:support@zubrilab.ru">support@zubrilab.ru</a> — восстановим доступ.</p>'+
     '<div class="msg" id="payMsg" aria-live="polite"></div>'+
     '<p style="font-size:.8rem;text-align:center">Оплата через CloudPayments. Оформляя подписку, ты принимаешь <a href="/oferta.html">условия оферты</a>.</p></div>';
-  const em=$('payEmail');if(a.email)em.value=a.email;else{const s=LS.get('zb_email');if(s)em.value=s}
   const pm=(t,ok)=>{$('payMsg').textContent=t;$('payMsg').className='msg '+(ok?'ok':'err')};
-  const getEmail=()=>{const v=em.value.trim().toLowerCase();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){pm('Укажи электронную почту — на неё придёт чек');em.focus();return null}LS.set('zb_email',v);return v};
-  const busy=b=>{['btnTrial','btnLife','btnRestore'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
+  const getEmail=()=>deviceId();
+  const busy=b=>{['btnTrial','btnLife'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
   const after=async(email,tries)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm('Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
   const run=async fn=>{const e=getEmail();if(!e)return;busy(true);try{await fn(e);await after(e)}catch(err){pm(err.message==='widget'?'Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.':'Оплата не прошла или была отменена.')}finally{busy(false)}};
   $('btnTrial').onclick=()=>run(expired?paySub:payTrial);
   $('btnLife').onclick=()=>run(payLife);
-  if(location.hash==='#buy-life'){$('btnLife').scrollIntoView({block:'center'});$('btnLife').style.outline='3px solid var(--mustard)';history.replaceState(null,'',location.pathname)}
-  $('btnRestore').onclick=async()=>{const e=getEmail();if(!e)return;busy(true);try{await after(e,1)}finally{busy(false)}};
+  const h=location.hash;if(/^#buy/.test(h)){history.replaceState(null,'',location.pathname);setTimeout(()=>(h==='#buy-life'?$('btnLife'):$('btnTrial')).click(),50)}
 }
 function newSession(){
   renderTrial();
