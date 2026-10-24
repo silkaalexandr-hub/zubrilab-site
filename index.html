@@ -67,6 +67,7 @@ h2{font-family:'PT Serif',Georgia,serif;font-size:34px;line-height:1.15;margin:0
 .fact p{margin:6px 0 8px;color:var(--ink2);font-size:16px}
 .src{display:block;font-size:13px;color:var(--muted);margin-top:8px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+a.plan{text-decoration:none;color:inherit;transition:transform .15s}a.plan:hover{transform:translateY(-2px)}
 footer{border-top:1px solid var(--line);padding:32px 0 44px;color:var(--muted);font-size:14px}
 footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
 @media (max-width:820px){
@@ -92,7 +93,8 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
       <p class="lead">Тренажёр на каждый день: короткие подходы, интервальное повторение и вписывание слов вместо угадывания. Слово возвращается на проверку через неделю, две, месяц — и так закрепится навсегда.</p>
       <p class="lead" style="font-size:17px;margin-top:-12px">С этим словарным запасом понимаешь большую часть повседневных разговоров и текстов. <a href="#science">Что говорят исследования →</a></p>
       <div class="cta">
-        <a class="btn" href="#how">Как это работает</a>
+        <a class="btn" href="/app/">Попробовать бесплатно</a>
+        <a href="#how" style="font-weight:600">Как это работает</a>
         <span class="soon">7 дней бесплатно · скоро в RuStore</span>
       </div>
     </div>
@@ -148,10 +150,10 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
   <section id="price">
     <h2>Цены</h2>
     <div class="price">
-      <div class="card main"><strong>Подписка</strong><span class="sum">199 ₽ / мес</span><span style="color:var(--ink2)">Первые 7 дней бесплатно. Отменить можно в любой момент.</span></div>
-      <div class="card"><strong>Навсегда</strong><span class="sum">490 ₽</span><span style="color:var(--ink2)">Один платёж — бессрочный доступ без подписки и повторных платежей. <a href="/oferta.html#life">Подробнее</a></span></div>
+      <a class="card main plan" href="/app/"><strong>Подписка</strong><span class="sum">199 ₽ / мес</span><span style="color:var(--ink2)">Первые 7 дней бесплатно. Отменить можно в любой момент.</span><span class="btn" style="margin-top:12px;align-self:flex-start">Начать бесплатно</span></a>
+      <a class="card plan" href="/app/"><strong>Навсегда</strong><span class="sum">490 ₽</span><span style="color:var(--ink2)">Один платёж — бессрочный доступ без подписки и повторных платежей.</span><span class="btn" style="margin-top:12px;align-self:flex-start">Попробовать и купить</span></a>
     </div>
-    <p class="note">Перед покупкой можно бесплатно пройти демо-урок. Оплата картой или через СБП, приём платежей — CloudPayments, электронный чек после каждой оплаты. Отменить подписку можно в любой момент. Оформляя подписку, вы принимаете условия <a href="/oferta.html">публичной оферты</a>.</p>
+    <p class="note">Сначала — бесплатный демо-урок на 5 минут, затем выбор тарифа. Что значит «навсегда» — <a href="/oferta.html#life">в оферте</a>. Оплата картой или через СБП, приём платежей — CloudPayments, электронный чек после каждой оплаты. Отменить подписку можно в любой момент. Оформляя подписку, вы принимаете условия <a href="/oferta.html">публичной оферты</a>.</p>
   </section>
 
   <footer>
