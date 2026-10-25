@@ -228,7 +228,7 @@ body{margin:0;background:var(--bg)}
   </details>
 
   <div class="status" id="status">Загружаю…</div>
-  <p class="foot"><a href="/">zubrilab.ru</a> · <a href="/oferta.html">Оферта</a> · <a href="/privacy.html">Конфиденциальность</a> · <a href="mailto:support@zubrilab.ru">support@zubrilab.ru</a></p>
+  <p class="foot"><a href="/">zubrilab.ru</a> · <a href="/oferta.html">Оферта</a> · <a href="/privacy.html">Конфиденциальность</a> · <a href="#restore">Восстановить покупку</a> · <a href="mailto:support@zubrilab.ru">support@zubrilab.ru</a></p>
 
   <details id="listBox">
     <summary>Мой список слов</summary>
@@ -512,7 +512,7 @@ function deviceId(){let d=LS.get('zb_id');if(!d){d='d_'+Array.from(crypto.getRan
 function accessActive(){const a=access();if(!a.plan)return false;if(a.plan==='life')return true;return !!(a.exp&&Date.now()<a.exp)}
 function trialLeft(){const a=access();if(a.plan!=='trial'||!a.until)return null;return Math.max(0,Math.ceil((a.until-Date.now())/86400000))}
 function renderTrial(){const p=$('trialPill');const a=access();const d=trialLeft();if(d!=null&&d>0){p.hidden=false;p.textContent='Пробный период: '+d+' дн.'}else if(a.plan==='code'&&accessActive()){p.hidden=false;p.textContent='Доступ по коду: '+Math.max(1,Math.ceil((a.until-Date.now())/86400000))+' дн.'}else p.hidden=true}
-function needPaywall(){if(accessActive())return false;if(/^#buy/.test(location.hash))return true;return LS.get('zb_demo_done')==='1'}
+function needPaywall(){if(accessActive())return false;if(/^#(buy|restore)/.test(location.hash))return true;return LS.get('zb_demo_done')==='1'}
 async function checkAccess(email){
   const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:email})});
   if(!r.ok)throw new Error('check '+r.status);
@@ -522,7 +522,7 @@ async function checkAccess(email){
   return j;
 }
 /* тихое обновление доступа при запуске; без сети доступ сохраняется до 7 дней */
-window.addEventListener('hashchange',()=>{if(/^#buy/.test(location.hash)&&!accessActive())showPaywall()});
+window.addEventListener('hashchange',()=>{if(/^#(buy|restore)/.test(location.hash)&&!accessActive())showPaywall()});
 (function(){const a=access();if(a.email&&a.plan!=='life'&&navigator.onLine!==false){checkAccess(a.email).then(renderTrial).catch(()=>{})}})();
 let cpLoaded=null;
 function loadCP(){if(window.cp)return Promise.resolve();if(cpLoaded)return cpLoaded;
@@ -574,19 +574,24 @@ function showPaywall(){
     '<button class="btn primary" id="btnTrial">'+(expired?'Подписка 199 ₽ в месяц':'Начать 7 дней бесплатно')+'</button>'+
     '<p style="font-size:.85rem;text-align:center">'+(expired?'Отменить можно в любой момент.':'Для проверки карты заблокируем 1 ₽ и вернём. Затем 199 ₽ в месяц. Отменить можно в любой момент до конца пробного периода — ничего не спишется.')+'</p>'+
     '<button class="price2" id="btnLife"><span><strong>Навсегда</strong><br><small style="color:var(--muted)">Один платёж, бессрочный доступ</small></span><strong>490 ₽</strong></button>'+
-    '<p style="font-size:.85rem;text-align:center">Сменил телефон? Напиши на <a href="mailto:support@zubrilab.ru">support@zubrilab.ru</a> — восстановим доступ.</p>'+
+    '<details id="restoreBox" style="text-align:center;font-size:.85rem;margin:.6rem 0"><summary style="cursor:pointer;font-weight:600">Уже покупали? Восстановить доступ</summary><p style="margin:.5rem 0">Введите почту, на которую пришёл чек об оплате, — пришлём код.</p><div style="display:flex;gap:.5rem"><input id="rsEmail" type="email" inputmode="email" autocomplete="email" placeholder="Почта из чека" style="flex:1;min-width:0;padding:.6rem .8rem;border:1px solid #ccc;border-radius:10px;font:inherit"><button class="btn" id="btnRsSend" style="width:auto;margin:0">Получить код</button></div><div id="rsCodeRow" hidden style="display:flex;gap:.5rem;margin-top:.5rem"><input id="rsCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Код из письма" style="flex:1;min-width:0;padding:.6rem .8rem;border:1px solid #ccc;border-radius:10px;font:inherit"><button class="btn" id="btnRsOk" style="width:auto;margin:0">Подтвердить</button></div></details>'+
     '<details style="text-align:center;font-size:.85rem;margin:.4rem 0"><summary style="cursor:pointer;color:var(--muted)">Есть код доступа?</summary><div style="display:flex;gap:.5rem;margin-top:.5rem"><input id="codeIn" autocomplete="off" autocapitalize="characters" placeholder="Код" style="flex:1;min-width:0;padding:.6rem .8rem;border:1px solid #ccc;border-radius:10px;font:inherit"><button class="btn" id="btnCode" style="width:auto;margin:0">Активировать</button></div></details>'+
     '<div class="msg" id="payMsg" aria-live="polite"></div>'+
     '<p style="font-size:.8rem;text-align:center">Оплата через CloudPayments. Оформляя подписку, ты принимаешь <a href="/oferta.html">условия оферты</a>.</p></div>';
   const pm=(t,ok)=>{$('payMsg').textContent=t;$('payMsg').className='msg '+(ok?'ok':'err')};
   const getEmail=()=>deviceId();
-  const busy=b=>{['btnTrial','btnLife','btnCode'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
+  const busy=b=>{['btnTrial','btnLife','btnCode','btnRsSend','btnRsOk'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
   const after=async(email,tries)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm('Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
   const run=async fn=>{const e=getEmail();if(!e)return;busy(true);try{await fn(e);await after(e)}catch(err){pm(err.message==='widget'?'Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.':'Оплата не прошла или была отменена.')}finally{busy(false)}};
   $('btnTrial').onclick=()=>run(expired?paySub:payTrial);
   $('btnLife').onclick=()=>run(payLife);
   $('btnCode').onclick=async()=>{const c=$('codeIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){saveAccess({plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,1500)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером. Попробуй ещё раз.')}finally{busy(false)}};
-  const h=location.hash;if(/^#buy/.test(h)){history.replaceState(null,'',location.pathname);setTimeout(()=>(h==='#buy-life'?$('btnLife'):$('btnTrial')).click(),50)}
+  let rsCh=null;
+  const jpost=async(path,body)=>{const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(_){}j._ok=r.ok;return j};
+  $('btnRsSend').onclick=async()=>{const e=$('rsEmail').value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){pm('Введите почту, на которую пришёл чек.');return}busy(true);pm('Ищу покупку… Это может занять до минуты.',true);try{const j=await jpost('/api/restore/start',{email:e});if(j.found){rsCh=j.challenge;$('rsCodeRow').hidden=false;$('rsCodeRow').style.display='flex';$('rsCode').focus();pm('Код отправлен на '+e+'. Проверьте почту и папку «Спам».',true)}else if(j.error==='too_many_requests')pm('Слишком много попыток. Попробуйте через час.');else if(j._ok)pm('Покупок на эту почту не нашли. Проверьте адрес или напишите на support@zubrilab.ru.');else pm('Сервис временно недоступен. Попробуйте позже или напишите на support@zubrilab.ru.')}catch(_){pm('Нет связи с сервером. Проверьте интернет.')}finally{busy(false)}};
+  $('btnRsOk').onclick=async()=>{const c=$('rsCode').value.replace(/\D/g,'');if(c.length!==6||!rsCh){pm('Введите 6 цифр из письма.');return}busy(true);try{const j=await jpost('/api/restore/finish',{challenge:rsCh,code:c});if(j.ok){LS.set('zb_id',j.id);saveAccess({email:j.id,plan:j.plan,until:j.until,token:j.token,exp:Date.now()+7*86400000});pm('Готово! Доступ восстановлен.',true);renderTrial();setTimeout(newSession,1500)}else pm(j.error==='bad_code'?'Неверный код. Проверьте цифры.':j.error==='expired'?'Код устарел — запросите новый.':j.error==='no_access'?'Покупка найдена, но доступ уже закончился.':'Не получилось. Попробуйте ещё раз.')}catch(_){pm('Нет связи с сервером. Проверьте интернет.')}finally{busy(false)}};
+  const h=location.hash;if(h==='#restore'){history.replaceState(null,'',location.pathname);$('restoreBox').open=true;setTimeout(()=>$('rsEmail').focus(),50)}
+  else if(/^#buy/.test(h)){history.replaceState(null,'',location.pathname);setTimeout(()=>(h==='#buy-life'?$('btnLife'):$('btnTrial')).click(),50)}
 }
 function newSession(){
   renderTrial();
