@@ -511,7 +511,7 @@ function saveAccess(a){LS.set('zb_access',JSON.stringify(a))}
 function deviceId(){let d=LS.get('zb_id');if(!d){d='d_'+Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>b.toString(16).padStart(2,'0')).join('');LS.set('zb_id',d)}return d}
 function accessActive(){const a=access();if(!a.plan)return false;if(a.plan==='life')return true;return !!(a.exp&&Date.now()<a.exp)}
 function trialLeft(){const a=access();if(a.plan!=='trial'||!a.until)return null;return Math.max(0,Math.ceil((a.until-Date.now())/86400000))}
-function renderTrial(){const p=$('trialPill');const d=trialLeft();if(d!=null&&d>0){p.hidden=false;p.textContent='Пробный период: '+d+' дн.'}else p.hidden=true}
+function renderTrial(){const p=$('trialPill');const a=access();const d=trialLeft();if(d!=null&&d>0){p.hidden=false;p.textContent='Пробный период: '+d+' дн.'}else if(a.plan==='code'&&accessActive()){p.hidden=false;p.textContent='Доступ по коду: '+Math.max(1,Math.ceil((a.until-Date.now())/86400000))+' дн.'}else p.hidden=true}
 function needPaywall(){if(accessActive())return false;if(/^#buy/.test(location.hash))return true;return LS.get('zb_demo_done')==='1'}
 async function checkAccess(email){
   const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:email})});
@@ -585,7 +585,7 @@ function showPaywall(){
   const run=async fn=>{const e=getEmail();if(!e)return;busy(true);try{await fn(e);await after(e)}catch(err){pm(err.message==='widget'?'Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.':'Оплата не прошла или была отменена.')}finally{busy(false)}};
   $('btnTrial').onclick=()=>run(expired?paySub:payTrial);
   $('btnLife').onclick=()=>run(payLife);
-  $('btnCode').onclick=async()=>{const c=$('codeIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){saveAccess({plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);setTimeout(newSession,600)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером. Попробуй ещё раз.')}finally{busy(false)}};
+  $('btnCode').onclick=async()=>{const c=$('codeIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){saveAccess({plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,1500)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером. Попробуй ещё раз.')}finally{busy(false)}};
   const h=location.hash;if(/^#buy/.test(h)){history.replaceState(null,'',location.pathname);setTimeout(()=>(h==='#buy-life'?$('btnLife'):$('btnTrial')).click(),50)}
 }
 function newSession(){
