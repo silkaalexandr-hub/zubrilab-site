@@ -553,7 +553,15 @@ async function paySub(email){
       recurrent:{interval:'Month',period:1,amount:PRICE_SUB,customerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB)}}}
   },{onSuccess:ok,onFail:(r)=>bad(new Error(r||'fail'))})});
 }
+const PRELAUNCH=true;
 function showPaywall(){
+  if(PRELAUNCH){
+    $('mode').textContent='Демо-урок пройден';$('mode').className='mode rev';
+    $('cardNum').textContent='';$('wordCount').textContent='';$('pips').innerHTML='';$('sbar').style.width='100%';
+    $('answerArea').innerHTML='';$('verdict').textContent='';
+    $('stage').innerHTML='<div class="pay"><h2>Полная версия — совсем скоро</h2><p>Мы заканчиваем словарь из 5000 самых употребительных слов с примерами и озвучкой. Запуск — в ноябре.</p><p>Хочешь узнать первым и получить скидку на старте? Напиши «хочу Зубрилу» на <a href="mailto:support@zubrilab.ru?subject=Хочу Зубрилу">support@zubrilab.ru</a>.</p></div>';
+    return;
+  }
   const a=access(), expired=!!a.email;
   $('mode').textContent=expired?'Доступ закончился':(LS.get('zb_demo_done')==='1'?'Демо-урок пройден':'Полный доступ');$('mode').className='mode rev';
   $('cardNum').textContent='';$('wordCount').textContent='';$('pips').innerHTML='';$('sbar').style.width='100%';
