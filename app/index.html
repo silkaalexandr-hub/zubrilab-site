@@ -982,7 +982,15 @@ function speakable(t){
   return t.replace(/\([^)]*\)/g,' ').replace(/\bsmth\b/gi,'something').replace(/\bsb\b/gi,'somebody')
           .replace(/\//g,' or ').replace(/\s+/g,' ').trim();
 }
+let curAudio=null;
+function slugW(t){return t.split(' (')[0].toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
 function speak(text){
+  if(!soundOn) return;
+  try{if(curAudio){curAudio.pause()} if(tts)tts.cancel()}catch(e){}
+  let fell=false;const fb=()=>{if(fell)return;fell=true;ttsSpeak(text)};
+  try{const a=new Audio('audio/'+slugW(text)+'.mp3');curAudio=a;a.onerror=fb;const p=a.play();if(p&&p.catch)p.catch(fb)}catch(e){fb()}
+}
+function ttsSpeak(text){
   if(!tts||!soundOn) return;
   try{
     tts.cancel();
@@ -994,11 +1002,10 @@ function speak(text){
 }
 function syncSound(){
   const b=$('btnSound');
-  if(!tts){b.textContent='Озвучка недоступна в этом браузере';b.disabled=true;return}
   b.textContent=soundOn?'🔊 Озвучка: вкл':'🔇 Озвучка: выкл';
   b.setAttribute('aria-pressed',soundOn);
 }
-$('btnSound').onclick=()=>{soundOn=!soundOn;LS.set('wt_sound',soundOn?'on':'off');syncSound();if(soundOn)speak('hello');else tts&&tts.cancel()};
+$('btnSound').onclick=()=>{soundOn=!soundOn;LS.set('wt_sound',soundOn?'on':'off');syncSound();if(soundOn)speak('good');else tts&&tts.cancel()};
 syncSound();
 
 
