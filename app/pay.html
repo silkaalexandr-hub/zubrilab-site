@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Оплата · Зубрила</title>
+<style>
+:root{--bg:#FBF8F2;--ink:#1F2A44;--muted:#5B6478;--line:#E6E0D4;--card:#fff;--mustard:#E0A92B}
+@media (prefers-color-scheme: dark){:root{--bg:#121a2b;--ink:#F3EFE6;--muted:#A9AFBE;--line:#2C3650;--card:#1a2338}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.box{max-width:420px;margin:0 16px;padding:28px 22px;background:var(--card);border:1px solid var(--line);border-radius:18px;text-align:center}
+h1{font-family:Georgia,"PT Serif",serif;font-size:24px;margin:0 0 8px}
+p{color:var(--muted);margin:8px 0}
+.btn{display:block;width:100%;margin-top:14px;padding:14px;border-radius:12px;border:0;font:inherit;font-weight:600;cursor:pointer;background:var(--ink);color:var(--bg)}
+.btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+</style></head>
+<body><div class="box">
+<h1 id="t">Открываем оплату…</h1>
+<p id="m">Сейчас появится защищённая форма CloudPayments.</p>
+<button class="btn" id="again" hidden>Открыть оплату ещё раз</button>
+<button class="btn sec" id="back">Вернуться в приложение</button>
+</div>
+<script>
+/* Страница оплаты для Android-приложения: форма CloudPayments работает только на zubrilab.ru,
+   поэтому приложение открывает эту страницу, а после оплаты возвращает пользователя обратно. */
+const CP_PUBLIC_ID='pk_7f712dd7d48796ce7d6c9a655dd57';
+const PRICE_SUB=199, PRICE_LIFE=490;
+const BACK='https://appassets.androidplatform.net/app/index.html';
+const q=new URLSearchParams(location.hash.slice(1));
+const id=q.get('id')||'', plan=q.get('plan')||'trial';
+const $=x=>document.getElementById(x);
+const back=s=>location.replace(BACK+(s?'#'+s:''));
+$('back').onclick=()=>back('');
+function receipt(label,price){return{Items:[{label,price,quantity:1,amount:price,vat:null,method:4,object:4}],taxationSystem:1,isBso:false,amounts:{electronic:price}}}
+function load(){return new Promise((ok,bad)=>{if(window.cp)return ok();const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>bad(new Error('widget'));document.head.appendChild(s)})}
+function opts(){
+  if(plan==='life')return['charge',{publicId:CP_PUBLIC_ID,description:'Зубрила: доступ навсегда',amount:PRICE_LIFE,currency:'RUB',invoiceId:'life:'+id,accountId:id,requireEmail:true,skin:'classic',
+    data:{CloudPayments:{CustomerReceipt:receipt('Доступ к «Зубриле» навсегда',PRICE_LIFE)}}}];
+  if(plan==='sub')return['charge',{publicId:CP_PUBLIC_ID,description:'Зубрила: подписка на месяц',amount:PRICE_SUB,currency:'RUB',accountId:id,requireEmail:true,skin:'classic',
+    data:{CloudPayments:{CustomerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB),recurrent:{interval:'Month',period:1,amount:PRICE_SUB,customerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB)}}}}];
+  const start=new Date(Date.now()+7*86400000).toISOString();
+  return['auth',{publicId:CP_PUBLIC_ID,description:'Зубрила: проверка карты для пробного периода (7 дней бесплатно, затем 199 ₽/мес)',amount:1,currency:'RUB',accountId:id,requireEmail:true,skin:'classic',
+    data:{CloudPayments:{recurrent:{interval:'Month',period:1,amount:PRICE_SUB,startDate:start,customerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB)}}}}];
+}
+async function pay(){
+  $('again').hidden=true;$('t').textContent='Открываем оплату…';$('m').textContent='Сейчас появится защищённая форма CloudPayments.';
+  try{await load()}catch(e){$('t').textContent='Нет связи';$('m').textContent='Не удалось открыть форму оплаты. Проверьте интернет.';$('again').hidden=false;return}
+  const [kind,o]=opts();
+  new cp.CloudPayments({language:'ru-RU'}).pay(kind,o,{
+    onSuccess:()=>{$('t').textContent='Оплата прошла!';$('m').textContent='Возвращаемся в приложение…';setTimeout(()=>back('paid'),800)},
+    onFail:()=>{$('t').textContent='Оплата не завершена';$('m').textContent='Можно попробовать ещё раз или вернуться в приложение.';$('again').hidden=false}
+  });
+}
+$('again').onclick=pay;
+if(!/^d_[a-f0-9]{24}$/.test(id)){$('t').textContent='Ошибка ссылки';$('m').textContent='Вернитесь в приложение и нажмите кнопку оплаты ещё раз.'}
+else pay();
+</script>
+</body></html>

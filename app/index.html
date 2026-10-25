@@ -524,6 +524,9 @@ async function checkAccess(email){
 /* тихое обновление доступа при запуске; без сети доступ сохраняется до 7 дней */
 window.addEventListener('hashchange',()=>{if(/^#(buy|restore)/.test(location.hash)&&!accessActive())showPaywall()});
 (function(){const a=access();if(a.email&&a.plan!=='life'&&navigator.onLine!==false){checkAccess(a.email).then(renderTrial).catch(()=>{})}})();
+/* возврат из оплаты (Android-приложение): ждём подтверждения и открываем доступ */
+(function(){if(location.hash!=='#paid')return;history.replaceState(null,'',location.pathname);const id=deviceId();let n=0;
+  const t=async()=>{try{const j=await checkAccess(id);if(j.active){location.reload();return}}catch(e){}if(++n<10)setTimeout(t,2500)};setTimeout(t,500)})();
 let cpLoaded=null;
 function loadCP(){if(window.cp)return Promise.resolve();if(cpLoaded)return cpLoaded;
   cpLoaded=new Promise((ok,bad)=>{const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>{cpLoaded=null;bad(new Error('widget'))};document.head.appendChild(s)});return cpLoaded}
@@ -582,7 +585,10 @@ function showPaywall(){
   const getEmail=()=>deviceId();
   const busy=b=>{['btnTrial','btnLife','btnCode','btnRs'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
   const after=async(email,tries)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm('Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
-  const run=async fn=>{const e=getEmail();if(!e)return;busy(true);try{await fn(e);await after(e)}catch(err){pm(err.message==='widget'?'Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.':'Оплата не прошла или была отменена.')}finally{busy(false)}};
+  const IN_APP=location.hostname==='appassets.androidplatform.net';
+  const run=async fn=>{const e=getEmail();if(!e)return;
+    if(IN_APP){location.href='https://zubrilab.ru/app/pay.html#'+new URLSearchParams({plan:fn===payLife?'life':fn===paySub?'sub':'trial',id:e});return}
+    busy(true);try{await fn(e);await after(e)}catch(err){pm(err.message==='widget'?'Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.':'Оплата не прошла или была отменена.')}finally{busy(false)}};
   $('btnTrial').onclick=()=>run(expired?paySub:payTrial);
   $('btnLife').onclick=()=>run(payLife);
   $('btnCode').onclick=async()=>{const c=$('codeIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){saveAccess({plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,1500)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером. Попробуй ещё раз.')}finally{busy(false)}};
