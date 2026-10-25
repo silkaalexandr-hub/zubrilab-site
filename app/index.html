@@ -553,7 +553,7 @@ async function paySub(email){
       recurrent:{interval:'Month',period:1,amount:PRICE_SUB,customerReceipt:receipt('Подписка «Зубрила», 1 месяц',PRICE_SUB)}}}
   },{onSuccess:ok,onFail:(r)=>bad(new Error(r||'fail'))})});
 }
-const PRELAUNCH=true;
+const PRELAUNCH=false;
 function showPaywall(){
   if(PRELAUNCH){
     $('mode').textContent='Демо-урок пройден';$('mode').className='mode rev';
