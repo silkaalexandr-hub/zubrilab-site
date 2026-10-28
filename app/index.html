@@ -722,7 +722,7 @@ function show(){
     const ex=EX[it.i];if(ex){$('exLine').textContent=ex[0];const sm=document.createElement('small');sm.textContent=ex[1];$('exLine').appendChild(sm)}else $('exLine').remove();
     $('btnKnow').onclick=()=>{if(locked)return;startKnow()};
     $('btnHear').onclick=()=>speak(w[0]);
-    $('btnGot').onclick=()=>{if(locked)return;locked=true;introDone()};
+    $('btnGot').onclick=()=>{if(locked)return;locked=true;area.querySelectorAll('button').forEach(b=>b.disabled=true);if(!soundOn){introDone();return}speak(w[0]);let done=false;const go=()=>{if(done)return;done=true;introDone()};const a=curAudio;if(a){a.addEventListener('ended',()=>setTimeout(go,200));a.addEventListener('error',()=>setTimeout(go,1300))}setTimeout(go,2500)};
     setTimeout(()=>$('btnGot')&&$('btnGot').focus(),30);
   }else if(kind==='A'||kind==='B'||kind==='R'){
     const opts=[w[0],...distractors(it.i)].sort(()=>Math.random()-.5);
