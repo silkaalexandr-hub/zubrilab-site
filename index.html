@@ -45,6 +45,14 @@ h1{font-family:'PT Serif',Georgia,serif;font-size:52px;line-height:1.08;margin:0
 section{padding:56px 0;border-top:1px solid var(--line)}
 h2{font-family:'PT Serif',Georgia,serif;font-size:34px;line-height:1.15;margin:0 0 28px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.promo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.promo a{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px 24px;transition:transform .15s,border-color .15s}
+.promo a:hover{transform:translateY(-2px);border-color:var(--ink)}
+.promo .k{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.promo h3{font-family:'PT Serif',Georgia,serif;font-size:27px;line-height:1.15;margin:10px 0 10px}
+.promo p{margin:0 0 14px;color:var(--ink2);font-size:16px}
+.promo .go{font-weight:700}
+@media (max-width:760px){.promo{grid-template-columns:1fr}.promo h3{font-size:24px}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px}
 .card h3{margin:0 0 8px;font-size:19px}
 .card p{margin:0;color:var(--ink2);font-size:16px}
@@ -107,6 +115,13 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
       <div class="opt"><b>3</b>avoid</div>
     </div>
   </div>
+
+  <section id="why">
+    <div class="promo">
+      <a href="/app/"><span class="k">Реальный прогресс</span><h3>Каждый день видишь, сколько слов уже твои</h3><p>Счётчик выученных слов растёт с каждым подходом, а проверка через неделю показывает: слова не забылись. Не ощущение «вроде что-то учу», а цифра.</p><span class="go">Начать бесплатный урок →</span></a>
+      <a href="/app/"><span class="k">Время с пользой</span><h3>Очередь, метро, ожидание — уже не потерянное время</h3><p>Подход занимает пару минут и работает без интернета. Пока ждёшь кофе, автобус или приём у врача — ещё несколько слов стали твоими.</p><span class="go">Попробовать за 5 минут →</span></a>
+    </div>
+  </section>
 
   <section>
     <h2>Почему слова остаются в голове</h2>
