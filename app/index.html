@@ -605,6 +605,7 @@ function newSession(){
   renderTrial();
   if(needPaywall()){showPaywall();return}
   SESSION=accessActive()?100:40;
+  setTimeout(()=>{prefetchAudio()},800);
   plan=pickWords();
   pos=0;lastWord=-1;planned=plan.reduce((s,it)=>s+it.left,0);
   sess={ok:0,bad:0,learned:0,fresh:0,promoted:0};
@@ -999,11 +1000,23 @@ function speakable(t){
 }
 let curAudio=null;
 function slugW(t){return t.split(' (')[0].toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+/* офлайн-озвучка на сайте: записи слов текущего подхода заранее кладём в постоянный кэш и играем из памяти */
+const AUD=new Map(), AUD_CACHE='zubrila-audio';
+function audSrc(text){const k=slugW(text);return AUD.get(k)||('audio/'+k+'.mp3')}
+async function prefetchAudio(){
+  if(!('caches' in window)||location.hostname==='appassets.androidplatform.net')return;
+  try{const c=await caches.open(AUD_CACHE);
+    const keys=[...new Set(plan.map(it=>slugW(words[it.i][0])))].slice(0,150);
+    for(const k of keys){if(AUD.has(k))continue;const u='audio/'+k+'.mp3';let r=await c.match(u);
+      if(!r){if(navigator.onLine===false)continue;try{r=await fetch(u);if(!r.ok)continue;await c.put(u,r.clone())}catch(e){continue}}
+      AUD.set(k,URL.createObjectURL(await r.blob()))}
+  }catch(e){}
+}
 function speak(text){
   if(!soundOn) return;
   try{if(curAudio){curAudio.pause()} if(tts)tts.cancel()}catch(e){}
   let fell=false;const fb=()=>{if(fell)return;fell=true;ttsSpeak(text)};
-  try{const a=new Audio('audio/'+slugW(text)+'.mp3');curAudio=a;a.onerror=fb;const p=a.play();if(p&&p.catch)p.catch(fb)}catch(e){fb()}
+  try{const a=new Audio(audSrc(text));curAudio=a;a.onerror=fb;const p=a.play();if(p&&p.catch)p.catch(fb)}catch(e){fb()}
 }
 function ttsSpeak(text){
   if(!tts||!soundOn) return;
