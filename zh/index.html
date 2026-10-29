@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Зубрила · китайский — 5181 слово HSK 1–6 с пиньинем и озвучкой</title>
+<meta name="description" content="Тренажёр китайских слов на русском: весь словарь HSK 3.0 (уровни 1–6), пиньинь с тонами, озвучка каждого слова, интервальное повторение и вписывание.">
+<link rel="icon" href="/zh/app/icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=PT+Serif:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF8F2; --card:#FFFFFF; --ink:#1F2A44; --ink2:#3A4560; --muted:#5B6478;
+  --line:#E6E0D4; --accent:#E0A92B; --accentSoft:#F3EBD8; --accentInk:#6E4E05;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121a2b; --card:#1a2338; --ink:#F3EFE6; --ink2:#D4D0C6; --muted:#A9AFBE;
+    --line:#2C3650; --accent:#E0A92B; --accentSoft:#3A3220; --accentInk:#F0C964;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Onest,system-ui,sans-serif;font-size:17px;line-height:1.55}
+a{color:var(--ink)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
+.logo{display:flex;align-items:center;gap:10px;font-family:'PT Serif',Georgia,serif;font-weight:700;font-size:22px;text-decoration:none}
+.logo .mark{width:36px;height:36px;border-radius:10px;background:#1F2A44;color:#FBF8F2;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative}
+.logo .mark::after{content:"";position:absolute;left:9px;right:9px;bottom:6px;height:3px;border-radius:2px;background:var(--accent)}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;padding:40px 0 64px}
+h1{font-family:'PT Serif',Georgia,serif;font-size:52px;line-height:1.08;margin:0 0 18px;letter-spacing:-.5px}
+.lead{font-size:19px;color:var(--ink2);margin:0 0 28px;max-width:520px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;height:56px;padding:0 24px;border-radius:16px;background:#1F2A44;color:#fff;font-weight:600;font-size:17px;text-decoration:none;border:0}
+@media (prefers-color-scheme: dark){.btn{background:var(--accent);color:#1F2A44}}
+.soon{font-size:14px;color:var(--muted)}
+.pill{display:inline-block;background:var(--accentSoft);color:var(--accentInk);font-size:14px;font-weight:600;border-radius:999px;padding:6px 12px;margin-bottom:18px}
+.phone{justify-self:center;width:300px;border-radius:36px;background:var(--card);border:1px solid var(--line);padding:26px 18px;box-shadow:0 24px 60px -30px rgba(31,42,68,.35)}
+.phone .bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:22px}
+.phone .bar i{display:block;width:37%;height:100%;background:var(--accent)}
+.phone .q{font-weight:700;font-size:28px;text-align:center;margin:18px 0 4px}
+.phone .hint{font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px}
+.opt{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;font-family:'PT Serif',Georgia,serif;font-weight:700;font-size:19px;display:flex;gap:12px;align-items:center}
+.opt b{font-family:Onest,sans-serif;font-size:12px;width:24px;height:24px;border-radius:7px;background:var(--accentSoft);color:var(--accentInk);display:flex;align-items:center;justify-content:center}
+.opt.ok{border:2px solid var(--ink)}
+section{padding:56px 0;border-top:1px solid var(--line)}
+h2{font-family:'PT Serif',Georgia,serif;font-size:34px;line-height:1.15;margin:0 0 28px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.promo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.promo a{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px 24px;transition:transform .15s,border-color .15s}
+.promo a:hover{transform:translateY(-2px);border-color:var(--ink)}
+.promo .k{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.promo h3{font-family:'PT Serif',Georgia,serif;font-size:27px;line-height:1.15;margin:10px 0 10px}
+.promo p{margin:0 0 14px;color:var(--ink2);font-size:16px}
+.promo .go{font-weight:700}
+@media (max-width:760px){.promo{grid-template-columns:1fr}.promo h3{font-size:24px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px}
+.card h3{margin:0 0 8px;font-size:19px}
+.card p{margin:0;color:var(--ink2);font-size:16px}
+.steps{counter-reset:s;display:grid;gap:14px;max-width:720px}
+.step{display:flex;gap:16px;align-items:flex-start}
+.step::before{counter-increment:s;content:counter(s);flex-shrink:0;width:36px;height:36px;border-radius:999px;background:#1F2A44;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+@media (prefers-color-scheme: dark){.step::before{background:var(--accent);color:#1F2A44}}
+.step p{margin:5px 0 0;color:var(--ink2)}
+.step strong{color:var(--ink)}
+.price{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:720px}
+.price .card{display:flex;flex-direction:column;gap:6px}
+.price .sum{font-size:34px;font-weight:700}
+.price .card.main{border:2px solid var(--ink)}
+.note{color:var(--muted);font-size:15px;margin-top:16px;max-width:720px}
+.facts{display:grid;gap:14px}
+.fact{display:flex;gap:20px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px}
+.fact .num{flex-shrink:0;width:112px;font-family:'PT Serif',Georgia,serif;font-weight:700;font-size:40px;line-height:1;color:var(--ink)}
+.fact .num small{display:block;font-family:Onest,sans-serif;font-weight:500;font-size:14px;color:var(--muted);margin-top:6px}
+.fact strong{font-size:19px}
+.fact p{margin:6px 0 8px;color:var(--ink2);font-size:16px}
+.src{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+a.plan{text-decoration:none;color:inherit;transition:transform .15s}a.plan:hover{transform:translateY(-2px)}
+footer{border-top:1px solid var(--line);padding:32px 0 44px;color:var(--muted);font-size:14px}
+footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;gap:36px;padding-top:16px}
+  h1{font-size:38px}
+  .grid3,.grid2,.price{grid-template-columns:1fr}
+  .fact{flex-direction:column;gap:10px}
+  .fact .num{width:auto}
+}
+.opt .py{margin-left:auto;font-family:Onest,sans-serif;font-weight:500;font-size:14px;color:var(--muted)}
+.opt .hz{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-weight:600;font-size:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo" href="/zh/"><span class="mark" aria-hidden="true">З</span><span>Зубрила<small style="display:block;font-family:Onest,sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accentInk)">китайский · HSK 1–6</small></span></a>
+    <a href="#price" style="font-weight:600;text-decoration:none">Цены</a>
+  </header>
+
+  <div class="hero">
+    <div>
+      <span class="pill">Весь словарь HSK 3.0 · 5181 слово</span>
+      <h1>Китайские слова, которые не забываются</h1>
+      <p class="lead">Тренажёр на каждый день: русский перевод, иероглифы, пиньинь с тонами и голос для каждого слова. Короткие подходы, интервальное повторение и вписывание пиньиня вместо угадывания.</p>
+      <p class="lead" style="font-size:17px;margin-top:-12px">Слова идут по уровням экзамена HSK — от первого к шестому, внутри уровня от самых частых.</p>
+      <div class="cta">
+        <a class="btn" href="/zh/app/">Бесплатный урок · 5 минут</a>
+        <a href="#how" style="font-weight:600">Как это работает</a>
+        <span class="soon">Без карты и регистрации. Понравится — 7 дней полного доступа бесплатно.<br>Приложение для Android — скоро в RuStore.</span>
+      </div>
+    </div>
+    <div class="phone" role="img" aria-label="Экран приложения: русское слово и три китайских варианта с пиньинем">
+      <div class="bar"><i></i></div>
+      <div class="q">друг</div>
+      <div class="hint">Выбери китайское слово</div>
+      <div class="opt"><b>1</b><span class="hz">老师</span><span class="py">lǎoshī</span></div>
+      <div class="opt ok"><b>2</b><span class="hz">朋友</span><span class="py">péngyou</span></div>
+      <div class="opt"><b>3</b><span class="hz">同学</span><span class="py">tóngxué</span></div>
+    </div>
+  </div>
+
+  <section>
+    <h2>Почему слова остаются в голове</h2>
+    <div class="grid3">
+      <div class="card"><h3>Вписываешь пиньинь</h3><p>Сначала выбор из трёх вариантов, потом слово нужно вписать самому. Тоны ставить не обязательно: <i>pengyou</i> = <i>péngyou</i>. Можно вписать и иероглифы.</p></div>
+      <div class="card"><h3>Слышишь каждое слово</h3><p>У всех 5181 слова есть запись голоса — с правильными тонами и изменениями тонов в речи (不, 一, два третьих тона подряд).</p></div>
+      <div class="card"><h3>Возвращает вовремя</h3><p>Выученные слова приходят на проверку через 7, 14, 28 дней и дальше. Ошибся — слово снова в работе.</p></div>
+      <div class="card"><h3>Уровни HSK</h3><p>Видно, сколько слов каждого уровня уже выучено: HSK 1, 2, 3… Удобно готовиться к экзамену.</p></div>
+      <div class="card"><h3>Похожие не путаются</h3><p>Варианты ответа — слова той же длины и уровня, а при ошибке тренажёр показывает, что значит выбранное слово.</p></div>
+      <div class="card"><h3>Работает без интернета</h3><p>Подход занимает пару минут. Очередь, метро, ожидание — ещё несколько слов стали твоими.</p></div>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2>Как проходит обучение</h2>
+    <div class="steps">
+      <div class="step"><div><strong>Знакомство.</strong><p>Перевод, иероглифы, пиньинь и голос.</p></div></div>
+      <div class="step"><div><strong>Заучивание.</strong><p>10 верных ответов в одном подходе, с растущими промежутками.</p></div></div>
+      <div class="step"><div><strong>Закрепление.</strong><p>Слово возвращается в следующих подходах.</p></div></div>
+      <div class="step"><div><strong>Вписывание.</strong><p>Пишешь пиньинь по русскому переводу.</p></div></div>
+      <div class="step"><div><strong>Проверки.</strong><p>Через неделю, две, месяц — до полного закрепления.</p></div></div>
+    </div>
+    <p class="note">Методика та же, что в английской «Зубриле»: проверка себя вместо перечитывания и повторы, растянутые во времени. <a href="/#science">Что говорят исследования →</a></p>
+  </section>
+
+  <section id="price">
+    <h2>Цены</h2>
+    <div class="price">
+      <a class="card main plan" href="/zh/app/#buy"><strong>Подписка</strong><span class="sum">199 ₽ / мес</span><span style="color:var(--ink2)">Первые 7 дней бесплатно. Отменить можно в любой момент.</span><span class="btn" style="margin-top:12px;align-self:flex-start">Оформить: 7 дней бесплатно</span></a>
+      <a class="card plan" href="/zh/app/#buy-life"><strong>Навсегда</strong><span class="sum">490 ₽</span><span style="color:var(--ink2)">Один платёж — бессрочный доступ без подписки и повторных платежей.</span><span class="btn" style="margin-top:12px;align-self:flex-start">Купить за 490 ₽</span></a>
+    </div>
+    <p class="note">Китайская версия оплачивается отдельно от английской. Сначала — бесплатный демо-урок на 5 минут, затем выбор тарифа. Оплата картой или через СБП, приём платежей — CloudPayments, электронный чек после каждой оплаты. Оформляя подписку, вы принимаете условия <a href="/oferta.html">публичной оферты</a>.</p>
+  </section>
+
+  <footer>
+    <div class="row">
+      <div>Зубрила · китайский<br><span style="font-size:12px">Словарь HSK 3.0: complete-hsk-vocabulary, © drkameleon, MIT. Озвучка: Kokoro, Apache-2.0</span><br>ЗубриЛаб · ИП Силка Александр Владимирович<br>ИНН 272111426983 · ОГРНИП 315774600439502</div>
+      <div><a href="mailto:support@zubrilab.ru">support@zubrilab.ru</a><br><a href="/oferta.html">Публичная оферта</a> · <a href="/oferta.html#refund">Возврат</a><br><a href="/privacy.html">Политика конфиденциальности</a></div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
