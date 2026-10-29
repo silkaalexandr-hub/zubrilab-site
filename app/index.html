@@ -523,7 +523,7 @@ async function checkAccess(email){
 }
 /* тихое обновление доступа при запуске; без сети доступ сохраняется до 7 дней */
 window.addEventListener('hashchange',()=>{if(/^#(buy|restore)/.test(location.hash)&&!accessActive())showPaywall()});
-(function(){const a=access();if(a.email&&a.plan!=='life'&&navigator.onLine!==false){checkAccess(a.email).then(renderTrial).catch(()=>{})}})();
+(function(){const a=access();if(a.plan==='life'||(a.plan==='code'&&accessActive())||navigator.onLine===false)return;const was=accessActive();checkAccess(a.email||deviceId()).then(j=>{renderTrial();if(j.active&&!was)location.reload()}).catch(()=>{})})();
 /* возврат из оплаты (Android-приложение): ждём подтверждения и открываем доступ */
 (function(){if(location.hash!=='#paid')return;history.replaceState(null,'',location.pathname);const id=deviceId();let n=0;
   const t=async()=>{try{const j=await checkAccess(id);if(j.active){location.reload();return}}catch(e){}if(++n<10)setTimeout(t,2500)};setTimeout(t,500)})();
@@ -580,15 +580,17 @@ function showPaywall(){
     '<details id="restoreBox" style="text-align:center;font-size:.85rem;margin:.6rem 0"><summary style="cursor:pointer;font-weight:600">Уже покупали? Восстановить доступ</summary><p style="margin:.5rem 0" id="rsHint">Введите почту, которую указывали при покупке, — пришлём код.</p><div style="display:flex;flex-direction:column;gap:.5rem"><input id="rsIn" type="email" inputmode="email" autocomplete="email" placeholder="Ваша почта" style="flex:1;min-width:0;padding:.6rem .8rem;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card);color:var(--fg)"><button class="btn" id="btnRs" style="width:100%;margin:0">Получить код</button></div></details>'+
     '<details style="text-align:center;font-size:.85rem;margin:.4rem 0"><summary style="cursor:pointer;color:var(--muted)">Есть код доступа?</summary><div style="display:flex;gap:.5rem;margin-top:.5rem"><input id="codeIn" autocomplete="off" autocapitalize="characters" placeholder="Код" style="flex:1;min-width:0;padding:.6rem .8rem;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card);color:var(--fg)"><button class="btn" id="btnCode" style="width:auto;margin:0">Активировать</button></div></details>'+
     '<div class="msg" id="payMsg" aria-live="polite"></div>'+
+    '<p style="text-align:center;margin:.3rem 0"><button class="btn" id="btnPaid" style="width:auto;font-size:.85rem;padding:.5rem 1rem">Я уже оплатил — проверить</button></p>'+
     '<p style="font-size:.8rem;text-align:center">Оплата через CloudPayments. Оформляя подписку, ты принимаешь <a href="/oferta.html">условия оферты</a>.</p></div>';
   const pm=(t,ok)=>{$('payMsg').textContent=t;$('payMsg').className='msg '+(ok?'ok':'err')};
   const getEmail=()=>deviceId();
-  const busy=b=>{['btnTrial','btnLife','btnCode','btnRs'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
-  const after=async(email,tries)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm('Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
+  const busy=b=>{['btnTrial','btnLife','btnCode','btnRs','btnPaid'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
+  const after=async(email,tries,failMsg)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm(failMsg||'Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
   const IN_APP=location.hostname==='appassets.androidplatform.net';
   const run=async fn=>{const e=getEmail();if(!e)return;
     if(IN_APP){location.href='https://zubrilab.ru/app/pay.html#'+new URLSearchParams({plan:fn===payLife?'life':fn===paySub?'sub':'trial',id:e});return}
-    busy(true);try{await fn(e);await after(e)}catch(err){pm(err.message==='widget'?'Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.':'Оплата не прошла или была отменена.')}finally{busy(false)}};
+    busy(true);try{await fn(e);await after(e)}catch(err){if(err.message==='widget')pm('Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.');else await after(e,3,'Оплата не прошла или была отменена. Если деньги списались — нажми «Я уже оплатил».')}finally{busy(false)}};
+  $('btnPaid').onclick=async()=>{busy(true);try{await after(getEmail(),3)}finally{busy(false)}};
   $('btnTrial').onclick=()=>run(expired?paySub:payTrial);
   $('btnLife').onclick=()=>run(payLife);
   $('btnCode').onclick=async()=>{const c=$('codeIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){saveAccess({plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,1500)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером. Попробуй ещё раз.')}finally{busy(false)}};

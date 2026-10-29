@@ -29,7 +29,7 @@ const q=new URLSearchParams(location.hash.slice(1));
 const id=q.get('id')||'', plan=q.get('plan')||'trial';
 const $=x=>document.getElementById(x);
 const back=s=>location.replace(BACK+(s?'#'+s:''));
-$('back').onclick=()=>back('');
+$('back').onclick=()=>back('paid');
 function receipt(label,price){return{Items:[{label,price,quantity:1,amount:price,vat:null,method:4,object:4}],taxationSystem:1,isBso:false,amounts:{electronic:price}}}
 function load(){return new Promise((ok,bad)=>{if(window.cp)return ok();const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>bad(new Error('widget'));document.head.appendChild(s)})}
 function opts(){
