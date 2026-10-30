@@ -265,7 +265,7 @@ function finish(){
       <div class="stars">${[0,1,2].map(k=>`<span class="${k<s?'':'off'}">⭐</span>`).join('')}</div>
       <div class="score">${G.score.toLocaleString('ru-RU')}<small>очков</small></div>
       <div class="wl">${ids.map(i=>`<div class="${G.miss.has(i)?'miss':''}"><b>${esc(WORDS[i][0])}</b><span>${esc(WORDS[i][1])}</span></div>`).join('')}</div>
-      ${G.miss.size?zubCard('Доучи слова с ошибками','В «Зубриле» каждое слово закрепляется: 10 повторов, вписывание, проверка через неделю.','Доучить в Зубриле'):''}
+      ${G.miss.size?zubCard('Запомни трудные слова','В «Зубриле» слово повторяется, пока не запомнится: сегодня, через неделю и через месяц.','Учить в Зубриле'):''}
       <div class="row"><button class="btn" id="again">Ещё раз</button><button class="btn main" id="next">${won&&l+1<LEVELS?'Дальше →':'К уровням'}</button></div>
     </div>`;
   $('#again').onclick=()=>play(l);
