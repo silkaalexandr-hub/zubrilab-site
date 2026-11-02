@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14213D">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Электробезопасность 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap">
+<style>
+/* Тренажёр к проверке знаний по электробезопасности: одна колонка, крупный шрифт, всё в один палец.
+   Цвета: тёмно-синий щит + сигнальный жёлтый (знак «Осторожно, электрическое напряжение»). */
+:root{
+  --bg:#F3F5F9; --card:#FFFFFF; --ink:#14213D; --ink2:#46506A; --muted:#6B7590; --line:#DCE1EB;
+  --brand:#14213D; --brand-ink:#FFFFFF; --volt:#FFC400; --volt-ink:#3B2E00; --volt-soft:#FFF4CC;
+  --good:#167A45; --good-bg:#E2F4EA; --bad:#C2321F; --bad-bg:#FCE7E3; --info-bg:#EEF2FA;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-head:"Manrope","Golos Text",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1526; --card:#172036; --ink:#EEF1F7; --ink2:#C4CADA; --muted:#98A1B8; --line:#2A3550;
+  --brand:#1F2C4D; --brand-ink:#FFFFFF; --volt:#FFC400; --volt-ink:#3B2E00; --volt-soft:#3A3214;
+  --good:#5ED08E; --good-bg:#14321F; --bad:#FF8A75; --bad-bg:#3D1C17; --info-bg:#1D2842; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1526; --card:#172036; --ink:#EEF1F7; --ink2:#C4CADA; --muted:#98A1B8; --line:#2A3550;
+  --brand:#1F2C4D; --brand-ink:#FFFFFF; --volt:#FFC400; --volt-ink:#3B2E00; --volt-soft:#3A3214;
+  --good:#5ED08E; --good-bg:#14321F; --bad:#FF8A75; --bad-bg:#3D1C17; --info-bg:#1D2842; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--volt);outline-offset:2px}
+.bar{position:sticky;top:0;z-index:5;background:var(--brand);color:var(--brand-ink);padding-top:env(safe-area-inset-top,0px)}
+.bar .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;min-height:58px;
+  padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+.bar h1{flex:1;min-width:0;margin:0;font-family:var(--f-head);font-weight:800;font-size:1.12rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .ib{width:44px;height:44px;flex:none;border:0;border-radius:12px;background:rgba(255,255,255,.1);color:inherit;font-size:1.25rem;display:flex;align-items:center;justify-content:center}
+.bar .ib.on{color:var(--volt)}
+.bar .timer{font-variant-numeric:tabular-nums;font-weight:700;background:var(--volt);color:var(--volt-ink);border-radius:10px;padding:4px 10px;font-size:1rem}
+.bar .timer.low{background:var(--bad);color:#fff}
+.logo{width:34px;height:34px;flex:none;border-radius:9px;background:var(--volt);color:var(--volt-ink);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800}
+main{max-width:720px;margin:0 auto;padding-block:16px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card h2{margin:0 0 4px;font-family:var(--f-head);font-weight:800;font-size:1.15rem;line-height:1.25}
+.card p{margin:0;color:var(--ink2)}
+.small{font-size:.88rem;color:var(--muted)}
+.link{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;background:none;border:0;padding:0}
+.prof{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.prof b{font-family:var(--f-head);font-size:1.2rem}
+.pbar{height:10px;border-radius:5px;background:var(--line);overflow:hidden;margin:10px 0 8px}
+.pbar i{display:block;height:100%;background:var(--good);border-radius:5px}
+.act{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-height:78px}
+.act:active{transform:scale(.99)}
+.act:disabled{opacity:.55;cursor:default}
+.act .ic{width:46px;height:46px;flex:none;border-radius:12px;background:var(--info-bg);display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.act.main .ic{background:var(--volt);color:var(--volt-ink)}
+.act .tx{flex:1;min-width:0}
+.act b{display:block;font-family:var(--f-head);font-weight:800;font-size:1.1rem}
+.act span{color:var(--ink2);font-size:.95rem}
+.act .lock{font-size:1.1rem;color:var(--muted)}
+.promo{background:var(--brand);color:var(--brand-ink);border:0}
+.promo p{color:rgba(255,255,255,.85)}
+.promo .btn{margin-top:12px}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;border-radius:14px;border:0;background:var(--volt);color:var(--volt-ink);font-weight:700;font-size:1.05rem;padding:10px 16px;text-align:center}
+.btn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.foot{font-size:.85rem;color:var(--muted);text-align:center;line-height:1.45}
+/* вопрос */
+.meta{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.9rem;color:var(--muted)}
+.meta .tag{background:var(--info-bg);color:var(--ink);border-radius:999px;padding:3px 10px;font-weight:600;font-size:.82rem}
+.qtext{font-size:1.12rem;font-weight:600;line-height:1.45;margin:0}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;line-height:1.45;font-size:1rem}
+.opt .l{width:30px;height:30px;flex:none;border-radius:8px;background:var(--info-bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem}
+.opt .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.opt.sel{border-color:var(--ink)}
+.opt.sel .l{background:var(--ink);color:var(--card)}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.right .l{background:var(--good);color:#fff}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt.wrong .l{background:var(--bad);color:#fff}
+.opt:disabled{cursor:default}
+.expl{border-radius:14px;padding:14px;background:var(--info-bg);display:flex;flex-direction:column;gap:6px}
+.expl .v{font-family:var(--f-head);font-weight:800;font-size:1.1rem}
+.expl .v.good{color:var(--good)} .expl .v.bad{color:var(--bad)}
+.expl .ref{font-size:.98rem}
+.chk{font-size:.86rem;color:var(--volt-ink);background:var(--volt-soft);border-radius:10px;padding:8px 10px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chk{color:var(--volt)}}
+:root[data-theme="dark"] .chk{color:var(--volt)}
+.dock{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);z-index:5;padding-bottom:env(safe-area-inset-bottom,0px)}
+.dock .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:10px;padding-block:10px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.navs{display:flex;gap:6px;flex-wrap:wrap}
+.navs button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums}
+.navs button.done{background:var(--info-bg)}
+.navs button.cur{border:2px solid var(--ink)}
+/* итог */
+.big{font-family:var(--f-head);font-weight:800;font-size:1.6rem;line-height:1.2;margin:0}
+.big.good{color:var(--good)} .big.bad{color:var(--bad)}
+.rlist{display:flex;flex-direction:column;gap:10px}
+.ritem{border-left:5px solid var(--good)}
+.ritem.bad{border-left-color:var(--bad)}
+.ritem .q{font-weight:600;margin:4px 0 8px}
+.ritem .a{font-size:.95rem;margin:2px 0}
+.ritem .a b{font-weight:600}
+/* выбор группы */
+.chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.chip{min-height:56px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-family:var(--f-head);font-weight:800;font-size:1.2rem}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--card)}
+.seg{display:grid;gap:8px}
+.seg button{min-height:56px;text-align:left;border-radius:14px;border:2px solid var(--line);background:var(--card);padding:10px 14px;font-weight:600}
+.seg button small{display:block;font-weight:400;color:var(--muted);font-size:.85rem}
+.seg button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+label.fld{display:flex;flex-direction:column;gap:6px;font-weight:600}
+input.inp{font:inherit;font-weight:400;min-height:52px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 14px}
+.msg{min-height:1.4em;font-size:.95rem}
+.msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
+.feat{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.feat li{display:flex;gap:10px}
+.feat li::before{content:"✓";color:var(--good);font-weight:800}
+.price{font-family:var(--f-head);font-weight:800;font-size:2rem;margin:4px 0 0}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+summary{cursor:pointer;font-weight:600}
+.copy{user-select:all;font-weight:700}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/* ================= данные ================= */
+const SUPPORT='support@zubrilab.ru';
+const PRICE=490, FREE_EXAMS=2;
+const API='https://silkaalexandr-hub-zubrila-e726.twc1.net';
+const CP_PUBLIC_ID='pk_7f712dd7d48796ce7d6c9a655dd57';
+const IN_APP=location.hostname==='appassets.androidplatform.net';
+const GROUPS=['II','III','IV','V'];
+let BANK=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LS={get(k,d){try{const v=localStorage.getItem('eb_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+          set(k,v){try{localStorage.setItem('eb_'+k,JSON.stringify(v))}catch(e){}}};
+
+/* прогресс: stats[id]=[верно, неверно, последний ответ неверный] */
+const P={stats:LS.get('stats',{}),fav:LS.get('fav',[]),taken:LS.get('taken',0),done:LS.get('done',0),passed:LS.get('passed',0),
+  profile:LS.get('profile',null)};
+const save=()=>{LS.set('stats',P.stats);LS.set('fav',P.fav);LS.set('taken',P.taken);LS.set('done',P.done);LS.set('passed',P.passed);LS.set('profile',P.profile)};
+function answer(q,ok){const s=P.stats[q.id]||[0,0,0];if(ok){s[0]++;s[2]=0}else{s[1]++;s[2]=1}P.stats[q.id]=s;save()}
+const seen=q=>{const s=P.stats[q.id];return !!s&&(s[0]+s[1])>0};
+const learned=q=>{const s=P.stats[q.id];return !!s&&s[0]>0&&!s[2]};
+const wrongLast=q=>{const s=P.stats[q.id];return !!s&&!!s[2]};
+const isFav=q=>P.fav.includes(q.id);
+function toggleFav(q){P.fav=isFav(q)?P.fav.filter(x=>x!==q.id):[...P.fav,q.id];save()}
+
+function area(){return BANK.areas.find(a=>a.id===(P.profile&&P.profile.area))||BANK.areas[0]}
+function profLabel(){const p=P.profile;return 'Группа '+p.group+', '+(p.above?'до и выше 1000 В':'до 1000 В')}
+function questions(){
+  const a=area(),p=P.profile;
+  const f=a.questions.filter(q=>(!q.groups.length||q.groups.includes(p.group))&&(p.above?q.above1000:q.upTo1000));
+  return f.length?f:a.questions;
+}
+const byId=id=>{for(const a of BANK.areas){const q=a.questions.find(x=>x.id===id);if(q)return q}return null};
+
+/* ================= доступ (как в «Зубриле»: CloudPayments + сервер) ================= */
+function deviceId(){let d=LS.get('id',null);if(!d){d='e_'+Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>b.toString(16).padStart(2,'0')).join('');LS.set('id',d)}return d}
+function access(){return LS.get('access',{})||{}}
+function premium(){const a=access();if(a.plan==='life')return true;return !!(a.plan&&a.exp&&Date.now()<a.exp)}
+async function checkAccess(id){
+  const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+  if(!r.ok)throw new Error('check '+r.status);
+  const j=await r.json();
+  if(j.active)LS.set('access',{id,plan:j.plan,until:j.until,token:j.token,exp:j.plan==='code'?j.until:Date.now()+7*86400000});
+  return j;
+}
+(function(){const a=access();if(a.plan==='life'||navigator.onLine===false)return;const was=premium();
+  checkAccess(a.id||deviceId()).then(j=>{if(j.active&&!was)render()}).catch(()=>{})})();
+(function(){if(location.hash!=='#paid')return;history.replaceState(null,'',location.pathname);let n=0;
+  const t=async()=>{try{const j=await checkAccess(deviceId());if(j.active){toast('Полный доступ открыт. Спасибо!');render();return}}catch(e){}if(++n<10)setTimeout(t,2500)};setTimeout(t,500)})();
+let cpLoaded=null;
+function loadCP(){if(window.cp)return Promise.resolve();if(cpLoaded)return cpLoaded;
+  cpLoaded=new Promise((ok,bad)=>{const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>{cpLoaded=null;bad(new Error('widget'))};document.head.appendChild(s)});return cpLoaded}
+function receipt(label,price){return{Items:[{label,price,quantity:1,amount:price,vat:null,method:4,object:4}],taxationSystem:1,isBso:false,amounts:{electronic:price}}}
+async function payLife(id){
+  await loadCP();
+  return new Promise((ok,bad)=>{new cp.CloudPayments({language:'ru-RU'}).pay('charge',{
+    publicId:CP_PUBLIC_ID,description:'Электробезопасность 2026: полный доступ навсегда',amount:PRICE,currency:'RUB',
+    invoiceId:'life:'+id,accountId:id,requireEmail:true,skin:'classic',
+    data:{CloudPayments:{CustomerReceipt:receipt('Полный доступ «Электробезопасность 2026» навсегда',PRICE)}}
+  },{onSuccess:ok,onFail:r=>bad(new Error(r||'fail'))})});
+}
+
+/* ================= экраны ================= */
+let stack=[{v:'home'}];
+const cur=()=>stack[stack.length-1];
+/* история браузера = стек экранов, чтобы кнопка «Назад» телефона работала как ← */
+let skipPop=false;
+function go(s){stack.push(s);try{history.pushState({n:stack.length},'')}catch(e){}render();scrollTo(0,0)}
+function replace(s){stack[stack.length-1]=s;render();scrollTo(0,0)}
+function popScreen(){if(stack.length>1){const s=stack.pop();if(s.tick)clearInterval(s.tick);render();scrollTo(0,0)}}
+function back(){if(stack.length>1){try{history.back()}catch(e){popScreen()}}}
+function home(){const n=stack.length-1;stack.forEach(s=>s.tick&&clearInterval(s.tick));stack=[{v:'home'}];if(n>0){skipPop=true;try{history.go(-n)}catch(e){skipPop=false}}render();scrollTo(0,0)}
+addEventListener('popstate',()=>{
+  if(skipPop){skipPop=false;return}
+  const s=cur();
+  if(s.v==='exam'&&!s.exitAsk){s.exitAsk=true;try{history.pushState({n:stack.length},'')}catch(e){}toastExit();return}
+  popScreen();
+});
+function toast(t){const m=$('#toast');if(m){m.textContent=t;m.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>m.hidden=true,3500)}}
+
+function bar(title,{backBtn=true,right=''}={}){
+  return `<header class="bar"><div class="in">${backBtn?'<button class="ib" id="bk" aria-label="Назад">←</button>':'<span class="logo" aria-hidden="true">⚡</span>'}<h1>${esc(title)}</h1>${right}</div></header>`;
+}
+function render(){
+  if(!BANK)return;
+  if(!P.profile){profileView(true);return}
+  const s=cur();
+  ({home:homeView,learn:learnView,exam:examView,result:resultView,pay:payView,about:aboutView,profile:()=>profileView(false)})[s.v](s);
+  if(s.v==='exam')bindExamBack(s);else bindBack();
+}
+
+function homeView(){
+  const qs=questions(), L=qs.filter(learned).length, mist=qs.filter(wrongLast), favs=qs.filter(isFav), prem=premium(), free=Math.max(0,FREE_EXAMS-P.taken), a=area();
+  const first=Math.max(0,qs.findIndex(q=>!seen(q)));
+  $('#root').innerHTML=bar('Электробезопасность 2026',{backBtn:false,right:'<button class="ib" id="ab" aria-label="О приложении">ⓘ</button>'})+`<main>
+    <div class="card prof"><div><div class="small">${esc(a.title)}</div><b>${esc(profLabel())}</b></div><button class="link" id="chg">Изменить</button></div>
+    <div class="card"><h2>Выучено ${L} из ${qs.length}</h2><div class="pbar"><i style="width:${qs.length?L/qs.length*100:0}%"></i></div>
+      <p class="small">Экзаменов сдано: ${P.passed} из ${P.done}</p></div>
+    <button class="act main" id="a1"><span class="ic">📘</span><span class="tx"><b>Обучение</b><span>Все ${qs.length} вопросов с ответами и пояснениями — бесплатно</span></span></button>
+    <button class="act" id="a2"><span class="ic">⏱</span><span class="tx"><b>Пробный экзамен</b><span>${a.examSize} вопросов, ${a.examMinutes} минут, ошибок не больше ${a.examMaxErrors}${prem?'':' · бесплатно осталось '+free+' из '+FREE_EXAMS}</span></span>${!prem&&!free?'<span class="lock">🔒</span>':''}</button>
+    <button class="act" id="a3"><span class="ic">🔁</span><span class="tx"><b>Работа над ошибками</b><span>${mist.length?'Вопросов с ошибками: '+mist.length:'Ошибок пока нет'}</span></span>${prem?'':'<span class="lock">🔒</span>'}</button>
+    <button class="act" id="a4" ${favs.length?'':'disabled'}><span class="ic">★</span><span class="tx"><b>Избранное</b><span>${favs.length?'Вопросов: '+favs.length:'Отмечайте сложные вопросы звёздочкой'}</span></span></button>
+    ${prem?'<p class="small" style="text-align:center">✓ Полный доступ открыт</p>':`<div class="card promo"><h2>Полный доступ — ${PRICE} ₽ навсегда</h2><p>Безлимитные пробные экзамены и работа над ошибками. Один платёж, без подписки.</p><button class="btn" id="pr">Подробнее</button></div>`}
+    <p class="foot">${esc(BANK.source)}.<br>Приложение не является официальным ресурсом Ростехнадзора.</p>
+  </main><div id="toast" class="card" hidden style="position:fixed;left:16px;right:16px;bottom:20px;max-width:680px;margin:0 auto;z-index:9;background:var(--ink);color:var(--card);border:0"></div>`;
+  $('#ab').onclick=()=>go({v:'about'});
+  $('#chg').onclick=()=>go({v:'profile'});
+  $('#a1').onclick=()=>go({v:'learn',title:'Обучение',ids:qs.map(q=>q.id),i:first});
+  $('#a2').onclick=()=>{if(prem||free>0)startExam();else go({v:'pay',reason:'Бесплатные пробные экзамены закончились'})};
+  $('#a3').onclick=()=>{if(!prem)go({v:'pay',reason:'Работа над ошибками — в полном доступе'});else if(mist.length)go({v:'learn',title:'Работа над ошибками',ids:mist.map(q=>q.id),i:0});else toast('Ошибок пока нет — начните с обучения')};
+  $('#a4').onclick=()=>go({v:'learn',title:'Избранное',ids:favs.map(q=>q.id),i:0});
+  if($('#pr'))$('#pr').onclick=()=>go({v:'pay',reason:''});
+}
+
+function qBlock(q){return `<div class="meta"><span class="tag">${esc(q.topic)}</span><span>вопрос № ${q.n}</span></div><p class="qtext">${esc(q.text)}</p>`}
+function explBlock(q,ok){
+  return `<div class="expl">${ok==null?'':`<span class="v ${ok?'good':'bad'}">${ok?'Верно!':'Неверно'}</span>`}<span class="ref">${esc(q.explanation)}</span>${q.checked?'':'<span class="chk">⚠ Этот ответ ещё на сверке с текстом правил. Если вы уверены в другом — нажмите «Сообщить об ошибке».</span>'}</div>`;
+}
+const L_=i=>'АБВГДЕЖ'[i];
+
+function learnView(s){
+  const list=s.ids.map(byId).filter(Boolean);
+  if(!list.length){back();return}
+  s.i=Math.min(Math.max(0,s.i),list.length-1);
+  const q=list[s.i], ch=s.ch;
+  $('#root').innerHTML=bar(`${s.title}: ${s.i+1} из ${list.length}`,{right:`<button class="ib ${isFav(q)?'on':''}" id="fv" aria-label="${isFav(q)?'Убрать из избранного':'В избранное'}" aria-pressed="${isFav(q)}">${isFav(q)?'★':'☆'}</button>`})+`<main>
+    ${qBlock(q)}
+    <div class="opts">${q.options.map((o,i)=>`<button class="opt ${ch==null?'':i===q.correct?'right':i===ch?'wrong':''}" data-i="${i}" ${ch==null?'':'disabled'}><span class="l">${L_(i)}</span><span class="t">${esc(o)}</span></button>`).join('')}</div>
+    ${ch==null?'<p class="small">Выберите вариант — сразу увидите правильный ответ и пояснение.</p>':explBlock(q,ch===q.correct)}
+    <button class="link small" id="rep" style="align-self:flex-start">Сообщить об ошибке в этом вопросе</button>
+  </main><div class="dock"><div class="in"><button class="btn ghost" id="pv" ${s.i?'':'disabled'}>← Назад</button><button class="btn" id="nx">${s.i<list.length-1?'Далее →':'Готово'}</button></div></div>`;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(s.ch!=null)return;s.ch=+b.dataset.i;answer(q,s.ch===q.correct);learnView(s);bindBack()});
+  $('#fv').onclick=()=>{toggleFav(q);learnView(s);bindBack()};
+  $('#pv').onclick=()=>{s.i--;s.ch=null;render();scrollTo(0,0)};
+  $('#nx').onclick=()=>{if(s.i<list.length-1){s.i++;s.ch=null;render();scrollTo(0,0)}else back()};
+  $('#rep').onclick=()=>report(q);
+}
+function bindBack(){const bk=$('#bk');if(bk)bk.onclick=back}
+
+function report(q){go({v:'about',report:q})}
+
+function startExam(inPlace){
+  const a=area(), qs=[...questions()].sort(()=>Math.random()-.5).slice(0,a.examSize);
+  const s={v:'exam',ids:qs.map(q=>q.id),ans:qs.map(()=>null),i:0,end:Date.now()+a.examMinutes*60000,max:a.examMaxErrors};
+  P.taken++;save();               // попытка засчитывается сразу: лимит бесплатных экзаменов
+  s.tick=setInterval(()=>{const t=$('#tm');if(!t){return}const left=Math.max(0,s.end-Date.now());t.textContent=fmt(left);t.classList.toggle('low',left<60000);if(!left)finishExam(s,true)},1000);
+  inPlace?replace(s):go(s);
+}
+const fmt=ms=>{const t=Math.ceil(ms/1000);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
+function examView(s){
+  const qs=s.ids.map(byId), q=qs[s.i], a=s.ans[s.i], last=s.i===qs.length-1;
+  $('#root').innerHTML=bar(`Экзамен: ${s.i+1} из ${qs.length}`,{right:`<span class="timer" id="tm">${fmt(Math.max(0,s.end-Date.now()))}</span>`})+`<main>
+    <div class="navs" aria-label="Вопросы экзамена">${qs.map((_,k)=>`<button data-k="${k}" class="${k===s.i?'cur':''} ${s.ans[k]!=null?'done':''}" aria-label="Вопрос ${k+1}">${k+1}</button>`).join('')}</div>
+    ${qBlock(q)}
+    <div class="opts">${q.options.map((o,i)=>`<button class="opt ${a===i?'sel':''}" data-i="${i}"><span class="l">${L_(i)}</span><span class="t">${esc(o)}</span></button>`).join('')}</div>
+    <p class="small">Ответы проверяются в конце. Можно вернуться к любому вопросу.</p>
+  </main><div class="dock"><div class="in"><button class="btn ghost" id="pv" ${s.i?'':'disabled'}>← Назад</button><button class="btn" id="nx">${last?'Завершить':'Далее →'}</button></div></div>`;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{s.ans[s.i]=+b.dataset.i;examView(s);bindExamBack(s)});
+  document.querySelectorAll('.navs button').forEach(b=>b.onclick=()=>{s.i=+b.dataset.k;examView(s);bindExamBack(s);scrollTo(0,0)});
+  $('#pv').onclick=()=>{s.i--;examView(s);bindExamBack(s);scrollTo(0,0)};
+  $('#nx').onclick=()=>{if(!last){s.i++;examView(s);bindExamBack(s);scrollTo(0,0);return}
+    const empty=s.ans.filter(x=>x==null).length;
+    if(empty&&!s.warned){s.warned=true;$('#nx').textContent='Без ответа: '+empty+'. Завершить?';return}
+    finishExam(s,false)};
+}
+function bindExamBack(s){const bk=$('#bk');if(bk)bk.onclick=()=>{if(s.exitAsk)back();else{s.exitAsk=true;toastExit()}}}
+function toastExit(){const h=$('.bar h1');if(h)h.textContent='Нажмите ← ещё раз, чтобы прервать'}
+function finishExam(s,timeUp){
+  if(s.done)return;s.done=true;clearInterval(s.tick);
+  const qs=s.ids.map(byId);
+  qs.forEach((q,k)=>{if(s.ans[k]!=null)answer(q,s.ans[k]===q.correct)});
+  const errors=qs.filter((q,k)=>s.ans[k]!==q.correct).length, passed=!timeUp&&errors<=s.max;
+  P.done++;if(passed)P.passed++;save();
+  replace({v:'result',ids:s.ids,ans:s.ans,errors,passed,timeUp,max:s.max});
+}
+function resultView(s){
+  const qs=s.ids.map(byId);
+  $('#root').innerHTML=bar('Результат экзамена')+`<main>
+    <div class="card"><p class="big ${s.passed?'good':'bad'}">${s.passed?'Экзамен сдан':'Экзамен не сдан'}</p>
+      <p>${s.timeUp?'Время вышло. ':''}Ошибок: ${s.errors} из ${qs.length} (допускается ${s.max}).</p></div>
+    <div class="rlist">${qs.map((q,k)=>{const a=s.ans[k],ok=a===q.correct;return `<div class="card ritem ${ok?'':'bad'}">
+      <div class="meta"><span class="tag">${esc(q.topic)}</span><span>${ok?'✓ верно':'✗ ошибка'}</span></div>
+      <p class="q">${esc(q.text)}</p>
+      ${ok?'':`<p class="a"><b>Ваш ответ:</b> ${a==null?'нет ответа':esc(q.options[a])}</p>`}
+      <p class="a"><b>Правильно:</b> ${esc(q.options[q.correct])}</p>
+      ${ok?'':explBlock(q,null)}</div>`}).join('')}</div>
+    <button class="btn" id="again">Ещё один экзамен</button><button class="btn sec" id="hm">На главный экран</button>
+  </main>`;
+  $('#again').onclick=()=>{const free=Math.max(0,FREE_EXAMS-P.taken);if(premium()||free>0)startExam(true);else replace({v:'pay',reason:'Бесплатные пробные экзамены закончились'})};
+  $('#hm').onclick=home;
+}
+
+function profileView(first){
+  const p=P.profile||{group:'III',above:false,area:BANK.areas[0].id}, t={...p};
+  const draw=()=>{
+    $('#root').innerHTML=bar(first?'Электробезопасность 2026':'Ваша группа',{backBtn:!first})+`<main>
+      ${first?'<div class="card"><h2>Под что готовитесь?</h2><p>Выберите группу и напряжение — покажем только вопросы, которые будут на вашей проверке знаний.</p></div>':''}
+      ${BANK.areas.length>1?`<div class="card"><h2>Организация</h2><div class="seg">${BANK.areas.map(a=>`<button data-a="${a.id}" aria-pressed="${t.area===a.id}">${esc(a.title)}<small>${esc(a.subtitle)}</small></button>`).join('')}</div></div>`:`<div class="card"><h2>${esc(BANK.areas[0].title)}</h2><p class="small">${esc(BANK.areas[0].subtitle)}</p></div>`}
+      <div class="card"><h2>Группа по электробезопасности</h2><div class="chips">${GROUPS.map(g=>`<button class="chip" data-g="${g}" aria-pressed="${t.group===g}">${g}</button>`).join('')}</div></div>
+      <div class="card"><h2>Напряжение</h2><div class="seg">
+        <button data-v="0" aria-pressed="${!t.above}">До 1000 В</button>
+        <button data-v="1" aria-pressed="${t.above}">До и выше 1000 В</button></div></div>
+      <button class="btn" id="ok">${first?'Начать':'Сохранить'}</button>
+      <p class="foot">Приложение не является официальным ресурсом Ростехнадзора.</p></main>`;
+    document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{t.group=b.dataset.g;draw()});
+    document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{t.above=b.dataset.v==='1';draw()});
+    document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{t.area=b.dataset.a;draw()});
+    $('#ok').onclick=()=>{P.profile=t;save();if(first)render();else back()};
+    if(!first)bindBack();
+  };
+  draw();
+}
+
+function payView(s){
+  const prem=premium();
+  $('#root').innerHTML=bar('Полный доступ')+`<main>
+    ${s.reason?`<div class="card" style="background:var(--volt-soft);border:0"><p style="color:var(--ink)"><b>${esc(s.reason)}</b></p></div>`:''}
+    <div class="card"><h2>Подготовьтесь к проверке знаний без стресса</h2>
+      <ul class="feat"><li>Безлимитные пробные экзамены с таймером</li><li>Работа над ошибками — только то, что не знаете</li><li>Новые разделы перечня по мере выхода</li><li>Обновления базы при изменении вопросов</li><li>Без рекламы, работает без интернета</li></ul>
+      <p class="price">${PRICE} ₽</p><p class="small">Один платёж, без подписки, доступ навсегда. Обучение по всем вопросам остаётся бесплатным.</p></div>
+    ${prem?'<div class="card"><h2>✓ Полный доступ открыт</h2></div>':`<button class="btn" id="buy">Купить за ${PRICE} ₽</button>`}
+    <div class="msg" id="pm" aria-live="polite"></div>
+    <button class="btn sec" id="paid">Я уже оплатил — проверить</button>
+    <details id="rsBox"><summary>Восстановить покупку по почте</summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+      <p class="small" id="rsHint">Введите почту, которую указывали при оплате, — пришлём код.</p>
+      <input class="inp" id="rsIn" type="email" inputmode="email" autocomplete="email" placeholder="Ваша почта"><button class="btn sec" id="rsB">Получить код</button></div></details>
+    <details><summary>Есть код доступа?</summary><div style="display:flex;gap:8px;margin-top:10px"><input class="inp" id="cdIn" style="flex:1;min-width:0" autocapitalize="characters" placeholder="Код"><button class="btn sec" id="cdB" style="width:auto">Активировать</button></div></details>
+    <p class="foot">Оплата картой или через СБП, приём платежей — CloudPayments, электронный чек на почту. Оплачивая, вы принимаете условия <a href="https://zubrilab.ru/oferta.html" style="color:inherit">оферты</a>.</p>
+  </main>`;
+  bindBack();
+  const pm=(t,ok)=>{const m=$('#pm');m.textContent=t;m.className='msg '+(ok?'ok':'err')};
+  const busy=b=>document.querySelectorAll('main button').forEach(x=>x.disabled=b);
+  const after=async(tries,fail)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(deviceId());if(j.active){pm('Готово! Полный доступ открыт.',true);setTimeout(home,900);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm(fail||'Оплата пока не подтвердилась. Нажмите «Я уже оплатил» через минуту или напишите на '+SUPPORT)};
+  if($('#buy'))$('#buy').onclick=async()=>{const id=deviceId();
+    if(IN_APP){location.href='https://zubrilab.ru/app/pay.html#'+new URLSearchParams({plan:'life',id});return}
+    busy(true);try{await payLife(id);await after()}catch(e){if(e.message==='widget')pm('Не удалось открыть форму оплаты. Проверьте интернет.');else await after(3,'Оплата не прошла или отменена. Если деньги списались — нажмите «Я уже оплатил».')}finally{busy(false)}};
+  $('#paid').onclick=async()=>{busy(true);try{await after(3)}finally{busy(false)}};
+  $('#cdB').onclick=async()=>{const c=$('#cdIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){LS.set('access',{plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);setTimeout(home,900)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером.')}finally{busy(false)}};
+  let ch=null;
+  const jpost=async(path,body)=>{const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(_){}j._ok=r.ok;return j};
+  $('#rsB').onclick=async()=>{const inp=$('#rsIn');
+    if(!ch){const e=inp.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){pm('Введите почту, которую указывали при оплате.');return}
+      busy(true);pm('Ищу покупку… Это может занять до минуты.',true);
+      try{const j=await jpost('/api/restore/start',{email:e,product:'elbez'});
+        if(j.found){ch=j.challenge;inp.value='';inp.type='text';inp.inputMode='numeric';inp.placeholder='Код из письма';$('#rsB').textContent='Войти';$('#rsHint').textContent='Отправили код на '+e+'. Проверьте почту и «Спам».';pm('')}
+        else pm(j._ok?'Покупок на эту почту не нашли.':'Сервис временно недоступен. Напишите на '+SUPPORT)}catch(_){pm('Нет связи с сервером.')}finally{busy(false)}}
+    else{const c=inp.value.replace(/\D/g,'');if(c.length!==6){pm('Введите 6 цифр из письма.');return}busy(true);
+      try{const j=await jpost('/api/restore/finish',{challenge:ch,code:c});if(j.ok){LS.set('id',j.id);LS.set('access',{id:j.id,plan:j.plan,until:j.until,token:j.token,exp:Date.now()+7*86400000});pm('Готово! Покупка восстановлена.',true);setTimeout(home,900)}else pm(j.error==='bad_code'?'Неверный код.':j.error==='expired'?'Код устарел — запросите новый.':'Не получилось. Попробуйте ещё раз.')}catch(_){pm('Нет связи с сервером.')}finally{busy(false)}}};
+  if(location.hash==='#restore'){$('#rsBox').open=true}
+}
+
+function aboutView(s){
+  const q=s.report;
+  const subj=q?`Ошибка в вопросе ${q.id}`:'Электробезопасность 2026';
+  const mail='mailto:'+SUPPORT+'?subject='+encodeURIComponent(subj)+(q?'&body='+encodeURIComponent('Вопрос № '+q.n+' ('+q.id+'): '+q.text.slice(0,120)+'…\n\nЧто не так:\n'):'');
+  $('#root').innerHTML=bar(q?'Сообщить об ошибке':'О приложении')+`<main>
+    ${q?`<div class="card"><h2>Нашли неточность?</h2><p>Напишите нам на почту — проверим по тексту правил и исправим в ближайшем обновлении.</p>
+      <p style="margin-top:10px">Почта: <span class="copy">${SUPPORT}</span></p><p class="small" style="margin-top:6px">Укажите номер вопроса: <span class="copy">${esc(q.id)}</span></p>
+      <a class="btn" style="margin-top:12px;text-decoration:none" href="${mail}">Написать письмо</a></div>`:''}
+    ${q?'':`<div class="card"><h2>Электробезопасность 2026</h2><p class="small">База: ${esc(BANK.version)} · вопросов с ответами: ${BANK.areas.reduce((n,a)=>n+a.questions.length,0)}</p>
+      <p style="margin-top:8px">${esc(BANK.source)}.</p><p style="margin-top:8px">Тексты вопросов — дословно из официального перечня. Правильные ответы и пояснения подготовлены по текстам правил: ПОТЭЭ (приказ Минтруда № 903н), ПТЭЭП (приказ Минэнерго № 811), Правила работы с персоналом (приказ Минэнерго № 796), ПУЭ, первая помощь (приказ Минздрава № 220н).</p>
+      <p style="margin-top:8px"><b>Приложение не является официальным ресурсом Ростехнадзора.</b></p></div>
+    <button class="btn sec" id="pg">Изменить группу: ${esc(profLabel())}</button>
+    <a class="btn sec" style="text-decoration:none" href="${mail}">Написать в поддержку</a>
+    <p class="small" style="text-align:center">Почта: <span class="copy">${SUPPORT}</span></p>
+    <button class="btn sec" id="rs">Восстановить покупку</button>
+    <button class="btn ghost" id="rz" style="color:var(--bad)">Сбросить прогресс</button>
+    <p class="foot">ИП Силка Александр Владимирович · ИНН 272111426983<br><a href="https://zubrilab.ru/privacy.html" style="color:inherit">Политика конфиденциальности</a> · <a href="https://zubrilab.ru/oferta.html" style="color:inherit">Оферта</a></p>`}
+  </main>`;
+  bindBack();
+  if($('#pg'))$('#pg').onclick=()=>go({v:'profile'});
+  if($('#rs'))$('#rs').onclick=()=>{replace({v:'pay',reason:''});const d=$('#rsBox');if(d)d.open=true};
+  if($('#rz'))$('#rz').onclick=()=>{const b=$('#rz');if(!b.dataset.ask){b.dataset.ask=1;b.textContent='Точно сбросить? Нажмите ещё раз';return}
+    P.stats={};P.fav=[];P.passed=0;save();b.textContent='Прогресс сброшен';b.disabled=true};
+}
+
+/* ================= запуск ================= */
+fetch('bank.json?v=2026-09-01-81').then(r=>r.json()).then(b=>{BANK=b;render()}).catch(()=>{$('#root').innerHTML='<main><div class="card"><h2>Не удалось загрузить вопросы</h2><p>Обновите страницу.</p></div></main>'});
+</script>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
+</body>
+</html>

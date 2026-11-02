@@ -28,7 +28,7 @@ const BACK='https://appassets.androidplatform.net/app/index.html';
 const q=new URLSearchParams(location.hash.slice(1));
 const id=q.get('id')||'', plan=q.get('plan')||'trial';
 /* китайская версия: номер устройства z_…, своё название в чеке */
-const ZH=/^z_/.test(id), NAME=ZH?'Зубрила · китайский':'Зубрила';
+const NAME=/^z_/.test(id)?'Зубрила · китайский':/^e_/.test(id)?'Электробезопасность 2026':'Зубрила';
 const $=x=>document.getElementById(x);
 const back=s=>location.replace(BACK+(s?'#'+s:''));
 $('back').onclick=()=>back('paid');
@@ -36,7 +36,7 @@ function receipt(label,price){return{Items:[{label,price,quantity:1,amount:price
 function load(){return new Promise((ok,bad)=>{if(window.cp)return ok();const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>bad(new Error('widget'));document.head.appendChild(s)})}
 function opts(){
   if(plan==='life')return['charge',{publicId:CP_PUBLIC_ID,description:NAME+': доступ навсегда',amount:PRICE_LIFE,currency:'RUB',invoiceId:'life:'+id,accountId:id,requireEmail:true,skin:'classic',
-    data:{CloudPayments:{CustomerReceipt:receipt('Доступ к «'+NAME+'» навсегда',PRICE_LIFE)}}}];
+    data:{CloudPayments:{CustomerReceipt:receipt((/^e_/.test(id)?'Полный доступ':'Доступ')+' к «'+NAME+'» навсегда',PRICE_LIFE)}}}];
   if(plan==='sub')return['charge',{publicId:CP_PUBLIC_ID,description:NAME+': подписка на месяц',amount:PRICE_SUB,currency:'RUB',accountId:id,requireEmail:true,skin:'classic',
     data:{CloudPayments:{CustomerReceipt:receipt('Подписка «'+NAME+'», 1 месяц',PRICE_SUB),recurrent:{interval:'Month',period:1,amount:PRICE_SUB,customerReceipt:receipt('Подписка «'+NAME+'», 1 месяц',PRICE_SUB)}}}}];
   const start=new Date(Date.now()+7*86400000).toISOString();
@@ -53,7 +53,7 @@ async function pay(){
   });
 }
 $('again').onclick=pay;
-if(!/^[dz]_[a-f0-9]{24}$/.test(id)){$('t').textContent='Ошибка ссылки';$('m').textContent='Вернитесь в приложение и нажмите кнопку оплаты ещё раз.'}
+if(!/^[dze]_[a-f0-9]{24}$/.test(id)){$('t').textContent='Ошибка ссылки';$('m').textContent='Вернитесь в приложение и нажмите кнопку оплаты ещё раз.'}
 else pay();
 </script>
 </body></html>
