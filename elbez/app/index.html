@@ -236,9 +236,11 @@ function homeView(){
     <button class="act" id="a3"><span class="ic">🔁</span><span class="tx"><b>Работа над ошибками</b><span>${mist.length?'Вопросов с ошибками: '+mist.length:'Ошибок пока нет'}</span></span>${prem?'':'<span class="lock">🔒</span>'}</button>
     <button class="act" id="a4" ${favs.length?'':'disabled'}><span class="ic">★</span><span class="tx"><b>Избранное</b><span>${favs.length?'Вопросов: '+favs.length:'Отмечайте сложные вопросы звёздочкой'}</span></span></button>
     ${prem?'<p class="small" style="text-align:center">✓ Полный доступ открыт</p>':`<div class="card promo"><h2>Полный доступ — ${PRICE} ₽ навсегда</h2><p>Безлимитные пробные экзамены и работа над ошибками. Один платёж, без подписки.</p><button class="btn" id="pr">Подробнее</button></div>`}
+    <button class="link small" id="rep" style="align-self:center">⚑ Заметили ошибку? Дайте знать</button>
     <p class="foot">${esc(BANK.source)}.<br>Приложение не является официальным ресурсом Ростехнадзора.</p>
   </main><div id="toast" class="card" hidden style="position:fixed;left:16px;right:16px;bottom:20px;max-width:680px;margin:0 auto;z-index:9;background:var(--ink);color:var(--card);border:0"></div>`;
   $('#ab').onclick=()=>go({v:'about'});
+  $('#rep').onclick=()=>report(null);
   $('#chg').onclick=()=>go({v:'profile'});
   $('#a1').onclick=()=>go({v:'learn',title:'Обучение',ids:qs.map(q=>q.id),i:first});
   $('#a2').onclick=()=>{if(prem||free>0)startExam();else go({v:'pay',reason:'Бесплатные пробные экзамены закончились'})};
@@ -249,7 +251,7 @@ function homeView(){
 
 function qBlock(q){return `<div class="meta"><span class="tag">${esc(q.topic)}</span><span>вопрос № ${q.n}</span></div><p class="qtext">${esc(q.text)}</p>`}
 function explBlock(q,ok){
-  return `<div class="expl">${ok==null?'':`<span class="v ${ok?'good':'bad'}">${ok?'Верно!':'Неверно'}</span>`}<span class="ref">${esc(q.explanation)}</span>${q.checked?'':'<span class="chk">⚠ Этот ответ ещё на сверке с текстом правил. Если вы уверены в другом — нажмите «Сообщить об ошибке».</span>'}</div>`;
+  return `<div class="expl">${ok==null?'':`<span class="v ${ok?'good':'bad'}">${ok?'Верно!':'Неверно'}</span>`}<span class="ref">${esc(q.explanation)}</span>${q.checked?'':'<span class="chk">⚠ Этот ответ ещё на сверке с текстом правил. Если вы уверены в другом — нажмите «Заметили ошибку? Дайте знать».</span>'}</div>`;
 }
 const L_=i=>'АБВГДЕЖ'[i];
 
@@ -262,7 +264,7 @@ function learnView(s){
     ${qBlock(q)}
     <div class="opts">${q.options.map((o,i)=>`<button class="opt ${ch==null?'':i===q.correct?'right':i===ch?'wrong':''}" data-i="${i}" ${ch==null?'':'disabled'}><span class="l">${L_(i)}</span><span class="t">${esc(o)}</span></button>`).join('')}</div>
     ${ch==null?'<p class="small">Выберите вариант — сразу увидите правильный ответ и пояснение.</p>':explBlock(q,ch===q.correct)}
-    <button class="link small" id="rep" style="align-self:flex-start">Сообщить об ошибке в этом вопросе</button>
+    <button class="link small" id="rep" style="align-self:flex-start">⚑ Заметили ошибку? Дайте знать</button>
   </main><div class="dock"><div class="in"><button class="btn ghost" id="pv" ${s.i?'':'disabled'}>← Назад</button><button class="btn" id="nx">${s.i<list.length-1?'Далее →':'Готово'}</button></div></div>`;
   document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(s.ch!=null)return;s.ch=+b.dataset.i;answer(q,s.ch===q.correct);learnView(s);bindBack()});
   $('#fv').onclick=()=>{toggleFav(q);learnView(s);bindBack()};
@@ -272,7 +274,7 @@ function learnView(s){
 }
 function bindBack(){const bk=$('#bk');if(bk)bk.onclick=back}
 
-function report(q){go({v:'about',report:q})}
+function report(q){go({v:'about',report:q||'any'})}
 
 function startExam(inPlace){
   const a=area(), qs=[...questions()].sort(()=>Math.random()-.5).slice(0,a.examSize);
@@ -318,11 +320,12 @@ function resultView(s){
       <p class="q">${esc(q.text)}</p>
       ${ok?'':`<p class="a"><b>Ваш ответ:</b> ${a==null?'нет ответа':esc(q.options[a])}</p>`}
       <p class="a"><b>Правильно:</b> ${esc(q.options[q.correct])}</p>
-      ${ok?'':explBlock(q,null)}</div>`}).join('')}</div>
+      ${ok?'':explBlock(q,null)}<button class="link small" data-rep="${esc(q.id)}" style="margin-top:8px">⚑ Заметили ошибку? Дайте знать</button></div>`}).join('')}</div>
     <button class="btn" id="again">Ещё один экзамен</button><button class="btn sec" id="hm">На главный экран</button>
   </main>`;
   $('#again').onclick=()=>{const free=Math.max(0,FREE_EXAMS-P.taken);if(premium()||free>0)startExam(true);else replace({v:'pay',reason:'Бесплатные пробные экзамены закончились'})};
   $('#hm').onclick=home;
+  document.querySelectorAll('[data-rep]').forEach(b=>b.onclick=()=>report(byId(b.dataset.rep)));
 }
 
 function profileView(first){
@@ -385,18 +388,20 @@ function payView(s){
 }
 
 function aboutView(s){
-  const q=s.report;
-  const subj=q?`Ошибка в вопросе ${q.id}`:'Электробезопасность 2026';
-  const mail='mailto:'+SUPPORT+'?subject='+encodeURIComponent(subj)+(q?'&body='+encodeURIComponent('Вопрос № '+q.n+' ('+q.id+'): '+q.text.slice(0,120)+'…\n\nЧто не так:\n'):'');
-  $('#root').innerHTML=bar(q?'Сообщить об ошибке':'О приложении')+`<main>
-    ${q?`<div class="card"><h2>Нашли неточность?</h2><p>Напишите нам на почту — проверим по тексту правил и исправим в ближайшем обновлении.</p>
-      <p style="margin-top:10px">Почта: <span class="copy">${SUPPORT}</span></p><p class="small" style="margin-top:6px">Укажите номер вопроса: <span class="copy">${esc(q.id)}</span></p>
+  const rq=s.report, q=rq&&rq!=='any'?rq:null;
+  const subj=q?`Ошибка в вопросе ${q.id}`:rq?'Ошибка в приложении «Электробезопасность 2026»':'Электробезопасность 2026';
+  const body=q?'Вопрос № '+q.n+' ('+q.id+'): '+q.text.slice(0,120)+'…\n\nЧто не так:\n\n(Приложите, пожалуйста, скриншот экрана)\n':rq?'Что не так:\n\n(Приложите, пожалуйста, скриншот экрана)\n':'';
+  const mail='mailto:'+SUPPORT+'?subject='+encodeURIComponent(subj)+(body?'&body='+encodeURIComponent(body):'');
+  $('#root').innerHTML=bar(rq?'Заметили ошибку?':'О приложении')+`<main>
+    ${rq?`<div class="card"><h2>Дайте нам знать</h2><p>Сделайте скриншот экрана с ошибкой и пришлите его нам на почту с парой слов, что не так. Проверим по тексту правил и исправим в ближайшем обновлении.</p>
+      <p style="margin-top:10px">Почта: <span class="copy">${SUPPORT}</span></p>${q?`<p class="small" style="margin-top:6px">Номер вопроса: <span class="copy">${esc(q.id)}</span> — он уже вписан в письмо</p>`:''}
       <a class="btn" style="margin-top:12px;text-decoration:none" href="${mail}">Написать письмо</a></div>`:''}
-    ${q?'':`<div class="card"><h2>Электробезопасность 2026</h2><p class="small">База: ${esc(BANK.version)} · вопросов с ответами: ${BANK.areas.reduce((n,a)=>n+a.questions.length,0)}</p>
+    ${rq?'':`<div class="card"><h2>Электробезопасность 2026</h2><p class="small">База: ${esc(BANK.version)} · вопросов с ответами: ${BANK.areas.reduce((n,a)=>n+a.questions.length,0)}</p>
       <p style="margin-top:8px">${esc(BANK.source)}.</p><p style="margin-top:8px">Тексты вопросов — дословно из официального перечня. Правильные ответы и пояснения подготовлены по текстам правил: ПОТЭЭ (приказ Минтруда № 903н), ПТЭЭП (приказ Минэнерго № 811), Правила работы с персоналом (приказ Минэнерго № 796), ПУЭ, первая помощь (приказ Минздрава № 220н).</p>
       <p style="margin-top:8px"><b>Приложение не является официальным ресурсом Ростехнадзора.</b></p></div>
     <button class="btn sec" id="pg">Изменить группу: ${esc(profLabel())}</button>
     <a class="btn sec" style="text-decoration:none" href="${mail}">Написать в поддержку</a>
+    <button class="btn sec" id="rep2">⚑ Заметили ошибку? Дайте знать</button>
     <p class="small" style="text-align:center">Почта: <span class="copy">${SUPPORT}</span></p>
     <button class="btn sec" id="rs">Восстановить покупку</button>
     <button class="btn ghost" id="rz" style="color:var(--bad)">Сбросить прогресс</button>
@@ -404,6 +409,7 @@ function aboutView(s){
   </main>`;
   bindBack();
   if($('#pg'))$('#pg').onclick=()=>go({v:'profile'});
+  if($('#rep2'))$('#rep2').onclick=()=>report(null);
   if($('#rs'))$('#rs').onclick=()=>{replace({v:'pay',reason:''});const d=$('#rsBox');if(d)d.open=true};
   if($('#rz'))$('#rz').onclick=()=>{const b=$('#rz');if(!b.dataset.ask){b.dataset.ask=1;b.textContent='Точно сбросить? Нажмите ещё раз';return}
     P.stats={};P.fav=[];P.passed=0;save();b.textContent='Прогресс сброшен';b.disabled=true};
