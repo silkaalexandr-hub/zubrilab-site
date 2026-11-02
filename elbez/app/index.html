@@ -351,7 +351,7 @@ function payView(s){
   $('#root').innerHTML=bar('Полный доступ')+`<main>
     ${s.reason?`<div class="card" style="background:var(--volt-soft);border:0"><p style="color:var(--ink)"><b>${esc(s.reason)}</b></p></div>`:''}
     <div class="card"><h2>Подготовьтесь к проверке знаний без стресса</h2>
-      <ul class="feat"><li>Безлимитные пробные экзамены с таймером</li><li>Работа над ошибками — только то, что не знаете</li><li>Новые разделы перечня по мере выхода</li><li>Обновления базы при изменении вопросов</li><li>Без рекламы, работает без интернета</li></ul>
+      <ul class="feat"><li>Безлимитные пробные экзамены с таймером</li><li>Работа над ошибками — только то, что не знаете</li><li>Новые разделы перечня по мере выхода</li><li>Обновления базы при изменении вопросов</li><li>Без рекламы; вопросы и экзамены работают без интернета</li></ul>
       <p class="price">${PRICE} ₽</p><p class="small">Один платёж, без подписки, доступ навсегда. Обучение по всем вопросам остаётся бесплатным.</p></div>
     ${prem?'<div class="card"><h2>✓ Полный доступ открыт</h2></div>':`<button class="btn" id="buy">Купить за ${PRICE} ₽</button>`}
     <div class="msg" id="pm" aria-live="polite"></div>
@@ -410,7 +410,7 @@ function aboutView(s){
 }
 
 /* ================= запуск ================= */
-fetch('bank.json?v=2026-09-01-81').then(r=>r.json()).then(b=>{BANK=b;render()}).catch(()=>{$('#root').innerHTML='<main><div class="card"><h2>Не удалось загрузить вопросы</h2><p>Обновите страницу.</p></div></main>'});
+fetch('bank.json?v=2026-09-01-81-aad40403').then(r=>r.json()).then(b=>{BANK=b;render()}).catch(()=>{$('#root').innerHTML='<main><div class="card"><h2>Не удалось загрузить вопросы</h2><p>Обновите страницу.</p></div></main>'});
 </script>
 
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
