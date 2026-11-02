@@ -28,7 +28,7 @@ const BACK='https://appassets.androidplatform.net/app/index.html';
 const q=new URLSearchParams(location.hash.slice(1));
 const id=q.get('id')||'', plan=q.get('plan')||'trial';
 /* китайская версия: номер устройства z_…, своё название в чеке */
-const NAME=/^z_/.test(id)?'Зубрила · китайский':/^e_/.test(id)?'Электробезопасность 2026':'Зубрила';
+const NAME=/^z_/.test(id)?'Зубрила · китайский':/^e_/.test(id)?'Билеты по электробезопасности':'Зубрила';
 const $=x=>document.getElementById(x);
 const back=s=>location.replace(BACK+(s?'#'+s:''));
 $('back').onclick=()=>back('paid');

@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Электробезопасность 2026</title>
+<title>Билеты по электробезопасности</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap">
 <style>
@@ -189,9 +189,9 @@ function receipt(label,price){return{Items:[{label,price,quantity:1,amount:price
 async function payLife(id){
   await loadCP();
   return new Promise((ok,bad)=>{new cp.CloudPayments({language:'ru-RU'}).pay('charge',{
-    publicId:CP_PUBLIC_ID,description:'Электробезопасность 2026: полный доступ навсегда',amount:PRICE,currency:'RUB',
+    publicId:CP_PUBLIC_ID,description:'Билеты по электробезопасности: полный доступ навсегда',amount:PRICE,currency:'RUB',
     invoiceId:'life:'+id,accountId:id,requireEmail:true,skin:'classic',
-    data:{CloudPayments:{CustomerReceipt:receipt('Полный доступ «Электробезопасность 2026» навсегда',PRICE)}}
+    data:{CloudPayments:{CustomerReceipt:receipt('Полный доступ «Билеты по электробезопасности» навсегда',PRICE)}}
   },{onSuccess:ok,onFail:r=>bad(new Error(r||'fail'))})});
 }
 
@@ -227,7 +227,7 @@ function render(){
 function homeView(){
   const qs=questions(), L=qs.filter(learned).length, mist=qs.filter(wrongLast), favs=qs.filter(isFav), prem=premium(), free=Math.max(0,FREE_EXAMS-P.taken), a=area();
   const first=Math.max(0,qs.findIndex(q=>!seen(q)));
-  $('#root').innerHTML=bar('Электробезопасность 2026',{backBtn:false,right:'<button class="ib" id="ab" aria-label="О приложении">ⓘ</button>'})+`<main>
+  $('#root').innerHTML=bar('Электробезопасность',{backBtn:false,right:'<button class="ib" id="ab" aria-label="О приложении">ⓘ</button>'})+`<main>
     <div class="card prof"><div><div class="small">${esc(a.title)}</div><b>${esc(profLabel())}</b></div><button class="link" id="chg">Изменить</button></div>
     <div class="card"><h2>Выучено ${L} из ${qs.length}</h2><div class="pbar"><i style="width:${qs.length?L/qs.length*100:0}%"></i></div>
       <p class="small">Экзаменов сдано: ${P.passed} из ${P.done}</p></div>
@@ -331,7 +331,7 @@ function resultView(s){
 function profileView(first){
   const p=P.profile||{group:'III',above:false,area:BANK.areas[0].id}, t={...p};
   const draw=()=>{
-    $('#root').innerHTML=bar(first?'Электробезопасность 2026':'Ваша группа',{backBtn:!first})+`<main>
+    $('#root').innerHTML=bar(first?'Электробезопасность':'Ваша группа',{backBtn:!first})+`<main>
       ${first?'<div class="card"><h2>Под что готовитесь?</h2><p>Выберите группу и напряжение — покажем только вопросы, которые будут на вашей проверке знаний.</p></div>':''}
       ${BANK.areas.length>1?`<div class="card"><h2>Организация</h2><div class="seg">${BANK.areas.map(a=>`<button data-a="${a.id}" aria-pressed="${t.area===a.id}">${esc(a.title)}<small>${esc(a.subtitle)}</small></button>`).join('')}</div></div>`:`<div class="card"><h2>${esc(BANK.areas[0].title)}</h2><p class="small">${esc(BANK.areas[0].subtitle)}</p></div>`}
       <div class="card"><h2>Группа по электробезопасности</h2><div class="chips">${GROUPS.map(g=>`<button class="chip" data-g="${g}" aria-pressed="${t.group===g}">${g}</button>`).join('')}</div></div>
@@ -389,14 +389,14 @@ function payView(s){
 
 function aboutView(s){
   const rq=s.report, q=rq&&rq!=='any'?rq:null;
-  const subj=q?`Ошибка в вопросе ${q.id}`:rq?'Ошибка в приложении «Электробезопасность 2026»':'Электробезопасность 2026';
+  const subj=q?`Ошибка в вопросе ${q.id}`:rq?'Ошибка в приложении «Билеты по электробезопасности»':'Билеты по электробезопасности';
   const body=q?'Вопрос № '+q.n+' ('+q.id+'): '+q.text.slice(0,120)+'…\n\nЧто не так:\n\n(Приложите, пожалуйста, скриншот экрана)\n':rq?'Что не так:\n\n(Приложите, пожалуйста, скриншот экрана)\n':'';
   const mail='mailto:'+SUPPORT+'?subject='+encodeURIComponent(subj)+(body?'&body='+encodeURIComponent(body):'');
   $('#root').innerHTML=bar(rq?'Заметили ошибку?':'О приложении')+`<main>
     ${rq?`<div class="card"><h2>Дайте нам знать</h2><p>Сделайте скриншот экрана с ошибкой и пришлите его нам на почту с парой слов, что не так. Проверим по тексту правил и исправим в ближайшем обновлении.</p>
       <p style="margin-top:10px">Почта: <span class="copy">${SUPPORT}</span></p>${q?`<p class="small" style="margin-top:6px">Номер вопроса: <span class="copy">${esc(q.id)}</span> — он уже вписан в письмо</p>`:''}
       <a class="btn" style="margin-top:12px;text-decoration:none" href="${mail}">Написать письмо</a></div>`:''}
-    ${rq?'':`<div class="card"><h2>Электробезопасность 2026</h2><p class="small">База: ${esc(BANK.version)} · вопросов с ответами: ${BANK.areas.reduce((n,a)=>n+a.questions.length,0)}</p>
+    ${rq?'':`<div class="card"><h2>Билеты по электробезопасности</h2><p class="small">База: ${esc(BANK.version)} · вопросов с ответами: ${BANK.areas.reduce((n,a)=>n+a.questions.length,0)}</p>
       <p style="margin-top:8px">${esc(BANK.source)}.</p><p style="margin-top:8px">Тексты вопросов — дословно из официального перечня. Правильные ответы и пояснения подготовлены по текстам правил: ПОТЭЭ (приказ Минтруда № 903н), ПТЭЭП (приказ Минэнерго № 811), Правила работы с персоналом (приказ Минэнерго № 796), ПУЭ, первая помощь (приказ Минздрава № 220н).</p>
       <p style="margin-top:8px"><b>Приложение не является официальным ресурсом Ростехнадзора.</b></p></div>
     <button class="btn sec" id="pg">Изменить группу: ${esc(profLabel())}</button>
