@@ -88,6 +88,11 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
 }
 .opt .py{margin-left:auto;font-family:Onest,sans-serif;font-weight:500;font-size:14px;color:var(--muted)}
 .opt .hz{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-weight:600;font-size:22px}
+.fam{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 8px}
+.fam a{display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:999px;background:var(--card);text-decoration:none;font-weight:600;font-size:14px;color:var(--ink);white-space:nowrap}
+.fam a img{width:26px;height:26px;border-radius:8px}
+.fam a[aria-current]{border:2px solid var(--ink);padding:4px 11px 4px 4px}
+.fam a:hover{border-color:var(--ink)}
 </style>
 </head>
 <body>
@@ -96,6 +101,7 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
     <a class="logo" href="/zh/"><span class="mark" aria-hidden="true">З</span><span>Зубрила<small style="display:block;font-family:Onest,sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accentInk)">китайский · HSK 1–6</small></span></a>
     <a href="#price" style="font-weight:600;text-decoration:none">Цены</a>
   </header>
+  <nav class="fam" aria-label="Приложения Зубрилы"><a href="/"><img src="/icons/en-96.png" alt="">Учи английский</a><a href="/zh/" aria-current="page"><img src="/icons/zh-96.png" alt="">Учи китайский</a><a href="/blitz/"><img src="/icons/blitz-96.png" alt="">Быстрый английский: Блиц</a></nav>
 
   <div class="hero">
     <div>
@@ -150,6 +156,11 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
       <a class="card plan" href="/zh/app/#buy-life"><strong>Навсегда</strong><span class="sum">490 ₽</span><span style="color:var(--ink2)">Один платёж — бессрочный доступ без подписки и повторных платежей.</span><span class="btn" style="margin-top:12px;align-self:flex-start">Купить за 490 ₽</span></a>
     </div>
     <p class="note">Китайская версия оплачивается отдельно от английской. Сначала — бесплатный демо-урок на 5 минут, затем выбор тарифа. Оплата картой или через СБП, приём платежей — CloudPayments, электронный чек после каждой оплаты. Оформляя подписку, вы принимаете условия <a href="/oferta.html">публичной оферты</a>.</p>
+  </section>
+
+  <section id="family">
+    <h2>Ещё от Зубрилы</h2>
+    <div class="promo"><a href="/app/"><span class="k">Английский</span><h3>5000 самых нужных английских слов</h3><p>Тренажёр на каждый день: вписываешь слово, повторяешь через неделю и месяц. Американская озвучка, примеры.</p><span class="go">Начать бесплатный урок →</span></a><a href="/blitz/"><span class="k">Игра · бесплатно</span><h3>Блиц: «да или нет» за 6 секунд</h3><p>Слово и перевод — верно или нет? 625 уровней, жизни, комбо и звёзды. Без рекламы и покупок.</p><span class="go">Играть →</span></a></div>
   </section>
 
   <footer>

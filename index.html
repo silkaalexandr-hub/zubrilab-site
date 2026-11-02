@@ -85,6 +85,11 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
   .fact{flex-direction:column;gap:10px}
   .fact .num{width:auto}
 }
+.fam{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 8px}
+.fam a{display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:999px;background:var(--card);text-decoration:none;font-weight:600;font-size:14px;color:var(--ink);white-space:nowrap}
+.fam a img{width:26px;height:26px;border-radius:8px}
+.fam a[aria-current]{border:2px solid var(--ink);padding:4px 11px 4px 4px}
+.fam a:hover{border-color:var(--ink)}
 </style>
 </head>
 <body>
@@ -93,6 +98,7 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
     <a class="logo" href="/"><span class="mark" aria-hidden="true">З</span><span>Зубрила<small style="display:block;font-family:Onest,sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accentInk)">полезная рутина</small></span></a>
     <a href="#price" style="font-weight:600;text-decoration:none">Цены</a>
   </header>
+  <nav class="fam" aria-label="Приложения Зубрилы"><a href="/" aria-current="page"><img src="/icons/en-96.png" alt="">Учи английский</a><a href="/zh/"><img src="/icons/zh-96.png" alt="">Учи китайский</a><a href="/blitz/"><img src="/icons/blitz-96.png" alt="">Быстрый английский: Блиц</a></nav>
 
   <div class="hero">
     <div>
@@ -169,6 +175,11 @@ footer .row{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betwe
       <a class="card plan" href="/app/#buy-life"><strong>Навсегда</strong><span class="sum">490 ₽</span><span style="color:var(--ink2)">Один платёж — бессрочный доступ без подписки и повторных платежей.</span><span class="btn" style="margin-top:12px;align-self:flex-start">Купить за 490 ₽</span></a>
     </div>
     <p class="note">Сначала — бесплатный демо-урок на 5 минут, затем выбор тарифа. Что значит «навсегда» — <a href="/oferta.html#life">в оферте</a>. Оплата картой или через СБП, приём платежей — CloudPayments, электронный чек после каждой оплаты. Отменить подписку можно в любой момент. Оформляя подписку, вы принимаете условия <a href="/oferta.html">публичной оферты</a>.</p>
+  </section>
+
+  <section id="family">
+    <h2>Ещё от Зубрилы</h2>
+    <div class="promo"><a href="/zh/"><span class="k">Китайский</span><h3>Весь словарь HSK 1–6</h3><p>5000+ слов с иероглифами, пиньинем и озвучкой. Вписываешь пиньинь латиницей, тоны не нужны.</p><span class="go">Посмотреть →</span></a><a href="/blitz/"><span class="k">Игра · бесплатно</span><h3>Блиц: «да или нет» за 6 секунд</h3><p>Слово и перевод — верно или нет? 625 уровней, жизни, комбо и звёзды. Без рекламы и покупок.</p><span class="go">Играть →</span></a></div>
   </section>
 
   <footer>

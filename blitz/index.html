@@ -50,6 +50,7 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 .lvl.next .st{color:var(--sun)}
 .lvl:disabled{background:transparent;border-style:dashed;box-shadow:none;color:var(--ink-soft);opacity:.55;cursor:default}
 .maphint{text-align:center;font-weight:600;color:var(--ink-soft);font-size:.9rem;margin:0}
+.maphint.fam a{color:var(--ink);font-weight:800}
 
 /* ---------- игра ---------- */
 .hud{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -164,7 +165,8 @@ function mapView(){
     <div class="map">${cells}</div>
     <p class="maphint">Уровень ${Math.min(open,LEVELS-1)+1} из ${LEVELS} · ${(LEVELS*PER).toLocaleString('ru-RU')} самых нужных английских слов</p>
     <div class="row"><button class="btn main" id="go">▶ Уровень ${Math.min(open,LEVELS-1)+1}</button><button class="btn" id="snd">${sound?'🔊 Звук вкл':'🔇 Звук выкл'}</button></div>
-    ${zubCard('Хочешь выучить всерьёз?','«Зубрила» — тренажёр: вписываешь слова и повторяешь через неделю, месяц. Слова остаются навсегда.',IN_APP?'Скачать Зубрилу':'Открыть Зубрилу')}`;
+    ${zubCard('Хочешь выучить всерьёз?','«Зубрила» — тренажёр: вписываешь слова и повторяешь через неделю, месяц. Слова остаются навсегда.',IN_APP?'Скачать Зубрилу':'Открыть Зубрилу')}
+    ${IN_APP?'':'<p class="maphint fam"><a href="/">Учи английский</a> · <a href="/zh/">Учи китайский</a></p>'}`;
   $('#zub').onclick=openZubrila;
   document.querySelectorAll('.lvl:not(:disabled)').forEach(b=>b.onclick=()=>play(+b.dataset.l));
   $('#go').onclick=()=>play(Math.min(open,LEVELS-1));
