@@ -532,6 +532,8 @@ window.addEventListener('hashchange',()=>{if(/^#(buy|restore)/.test(location.has
 let cpLoaded=null;
 function loadCP(){if(window.cp)return Promise.resolve();if(cpLoaded)return cpLoaded;
   cpLoaded=new Promise((ok,bad)=>{const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>{cpLoaded=null;bad(new Error('widget'))};document.head.appendChild(s)});return cpLoaded}
+function ruDate(t){return new Date(t).toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}
+function trialDoneText(until){return 'Готово! 7 дней бесплатно. 1 ₽ мы не списываем — блокировка на карте снимется автоматически. Первое списание 199 ₽ — '+ruDate(until||Date.now()+7*86400000)+', отменить можно в любой момент до этой даты.'}
 function receipt(label,price){return{Items:[{label,price,quantity:1,amount:price,vat:null,method:4,object:4}],taxationSystem:1,isBso:false,amounts:{electronic:price}}}
 async function payTrial(email){
   await loadCP();
@@ -588,7 +590,7 @@ function showPaywall(){
   const pm=(t,ok)=>{$('payMsg').textContent=t;$('payMsg').className='msg '+(ok?'ok':'err')};
   const getEmail=()=>deviceId();
   const busy=b=>{['btnTrial','btnLife','btnCode','btnRs','btnPaid'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
-  const after=async(email,tries,failMsg)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){ZT('paid');pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm(failMsg||'Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
+  const after=async(email,tries,failMsg)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){ZT('paid');if(j.plan==='trial'){pm(trialDoneText(j.until),true);renderTrial();setTimeout(newSession,6000);return}pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm(failMsg||'Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
   const IN_APP=location.hostname==='appassets.androidplatform.net';
   const run=async fn=>{const e=getEmail();if(!e)return;ZT(fn===payLife?'pay_life':fn===paySub?'pay_sub':'pay_trial');
     if(IN_APP){location.href='https://zubrilab.ru/app/pay.html#'+new URLSearchParams({plan:fn===payLife?'life':fn===paySub?'sub':'trial',id:e});return}

@@ -12,6 +12,7 @@ h1{font-family:Georgia,"PT Serif",serif;font-size:24px;margin:0 0 8px}
 p{color:var(--muted);margin:8px 0}
 .btn{display:block;width:100%;margin-top:14px;padding:14px;border-radius:12px;border:0;font:inherit;font-weight:600;cursor:pointer;background:var(--ink);color:var(--bg)}
 .btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+[hidden]{display:none!important}
 </style></head>
 <body><div class="box">
 <h1 id="t">Открываем оплату…</h1>
@@ -52,7 +53,11 @@ async function pay(){
   ZT('pay_form_'+plan);
   const [kind,o]=opts();
   new cp.CloudPayments({language:'ru-RU'}).pay(kind,o,{
-    onSuccess:()=>{ZT('pay_ok_'+plan);$('t').textContent='Оплата прошла!';$('m').textContent='Возвращаемся в приложение…';setTimeout(()=>back('paid'),800)},
+    onSuccess:()=>{ZT('pay_ok_'+plan);
+      if(plan==='trial'){const d=new Date(Date.now()+7*86400000).toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+        $('t').textContent='Готово! 7 дней бесплатно';$('m').textContent='1 ₽ мы не списываем — блокировка на карте снимется автоматически. Первое списание 199 ₽ — '+d+', отменить можно в любой момент до этой даты.';
+        $('back').textContent='Вернуться в приложение';setTimeout(()=>back('paid'),9000);return}
+      $('t').textContent='Оплата прошла!';$('m').textContent=plan==='life'?'Доступ навсегда открыт. Возвращаемся в приложение…':'Возвращаемся в приложение…';setTimeout(()=>back('paid'),1500)},
     onFail:()=>{ZT('pay_fail_'+plan);$('t').textContent='Оплата не завершена';$('m').textContent='Можно попробовать ещё раз или вернуться в приложение.';$('again').hidden=false}
   });
 }
