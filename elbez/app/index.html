@@ -134,6 +134,8 @@ summary{cursor:pointer;font-weight:600}
 <div id="root"></div>
 
 <script>
+/* анонимная статистика шагов (без имён и почты): server/stats.js */
+const ZT=(()=>{const A='elbez',U='https://silkaalexandr-hub-zubrila-e726.twc1.net/api/ev';let id='';try{id=localStorage.getItem('zt_u')||'';if(!id){id='u'+Array.from(crypto.getRandomValues(new Uint8Array(9)),b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('zt_u',id)}}catch(e){}if(!id)id='u'+Math.random().toString(36).slice(2,14);const P=location.hostname==='appassets.androidplatform.net'?'apk':'web';const sent=new Set();const f=function(e){if(sent.has(e))return;sent.add(e);try{const b=JSON.stringify({a:A,e:e,u:id,p:P});if(navigator.sendBeacon&&navigator.sendBeacon(U,new Blob([b],{type:'text/plain'})))return;fetch(U,{method:'POST',body:b,keepalive:true,headers:{'Content-Type':'text/plain'}}).catch(()=>{})}catch(x){}};try{if(!localStorage.getItem('zt_first_'+A)){localStorage.setItem('zt_first_'+A,'1');f('install')}}catch(e){}f('open');return f})();
 /* ================= данные ================= */
 const SUPPORT='support@zubrilab.ru';
 const PRICE=490, FREE_EXAMS=2;
@@ -151,7 +153,8 @@ const LS={get(k,d){try{const v=localStorage.getItem('eb_'+k);return v==null?d:JS
 const P={stats:LS.get('stats',{}),fav:LS.get('fav',[]),taken:LS.get('taken',0),done:LS.get('done',0),passed:LS.get('passed',0),
   profile:LS.get('profile',null)};
 const save=()=>{LS.set('stats',P.stats);LS.set('fav',P.fav);LS.set('taken',P.taken);LS.set('done',P.done);LS.set('passed',P.passed);LS.set('profile',P.profile)};
-function answer(q,ok){const s=P.stats[q.id]||[0,0,0];if(ok){s[0]++;s[2]=0}else{s[1]++;s[2]=1}P.stats[q.id]=s;save()}
+let ztN=0;
+function answer(q,ok){ZT('answer');if(++ztN===20)ZT('answer20');const s=P.stats[q.id]||[0,0,0];if(ok){s[0]++;s[2]=0}else{s[1]++;s[2]=1}P.stats[q.id]=s;save()}
 const seen=q=>{const s=P.stats[q.id];return !!s&&(s[0]+s[1])>0};
 const learned=q=>{const s=P.stats[q.id];return !!s&&s[0]>0&&!s[2]};
 const wrongLast=q=>{const s=P.stats[q.id];return !!s&&!!s[2]};
@@ -181,7 +184,7 @@ async function checkAccess(id){
 (function(){const a=access();if(a.plan==='life'||navigator.onLine===false)return;const was=premium();
   checkAccess(a.id||deviceId()).then(j=>{if(j.active&&!was)render()}).catch(()=>{})})();
 (function(){if(location.hash!=='#paid')return;history.replaceState(null,'',location.pathname);let n=0;
-  const t=async()=>{try{const j=await checkAccess(deviceId());if(j.active){toast('Полный доступ открыт. Спасибо!');render();return}}catch(e){}if(++n<10)setTimeout(t,2500)};setTimeout(t,500)})();
+  const t=async()=>{try{const j=await checkAccess(deviceId());if(j.active){ZT('paid');toast('Полный доступ открыт. Спасибо!');render();return}}catch(e){}if(++n<10)setTimeout(t,2500)};setTimeout(t,500)})();
 let cpLoaded=null;
 function loadCP(){if(window.cp)return Promise.resolve();if(cpLoaded)return cpLoaded;
   cpLoaded=new Promise((ok,bad)=>{const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>{cpLoaded=null;bad(new Error('widget'))};document.head.appendChild(s)});return cpLoaded}
@@ -255,7 +258,7 @@ function explBlock(q,ok){
 }
 const L_=i=>'АБВГДЕЖ'[i];
 
-function learnView(s){
+function learnView(s){ZT('learn');
   const list=s.ids.map(byId).filter(Boolean);
   if(!list.length){back();return}
   s.i=Math.min(Math.max(0,s.i),list.length-1);
@@ -274,12 +277,12 @@ function learnView(s){
 }
 function bindBack(){const bk=$('#bk');if(bk)bk.onclick=back}
 
-function report(q){go({v:'about',report:q||'any'})}
+function report(q){ZT('report');go({v:'about',report:q||'any'})}
 
 function startExam(inPlace){
   const a=area(), qs=[...questions()].sort(()=>Math.random()-.5).slice(0,a.examSize);
   const s={v:'exam',ids:qs.map(q=>q.id),ans:qs.map(()=>null),i:0,end:Date.now()+a.examMinutes*60000,max:a.examMaxErrors};
-  P.taken++;save();               // попытка засчитывается сразу: лимит бесплатных экзаменов
+  P.taken++;save();ZT('exam_start');               // попытка засчитывается сразу: лимит бесплатных экзаменов
   s.tick=setInterval(()=>{const t=$('#tm');if(!t){return}const left=Math.max(0,s.end-Date.now());t.textContent=fmt(left);t.classList.toggle('low',left<60000);if(!left)finishExam(s,true)},1000);
   inPlace?replace(s):go(s);
 }
@@ -307,7 +310,7 @@ function finishExam(s,timeUp){
   const qs=s.ids.map(byId);
   qs.forEach((q,k)=>{if(s.ans[k]!=null)answer(q,s.ans[k]===q.correct)});
   const errors=qs.filter((q,k)=>s.ans[k]!==q.correct).length, passed=!timeUp&&errors<=s.max;
-  P.done++;if(passed)P.passed++;save();
+  P.done++;if(passed)P.passed++;save();ZT(passed?'exam_pass':'exam_fail');
   replace({v:'result',ids:s.ids,ans:s.ans,errors,passed,timeUp,max:s.max});
 }
 function resultView(s){
@@ -343,14 +346,14 @@ function profileView(first){
     document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{t.group=b.dataset.g;draw()});
     document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{t.above=b.dataset.v==='1';draw()});
     document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{t.area=b.dataset.a;draw()});
-    $('#ok').onclick=()=>{P.profile=t;save();if(first)render();else back()};
+    $('#ok').onclick=()=>{P.profile=t;save();ZT('profile_'+t.group+(t.above?'_hi':'_lo'));if(first)render();else back()};
     if(!first)bindBack();
   };
   draw();
 }
 
 function payView(s){
-  const prem=premium();
+  const prem=premium();ZT(prem?'pay_screen_prem':'paywall');
   $('#root').innerHTML=bar('Полный доступ')+`<main>
     ${s.reason?`<div class="card" style="background:var(--volt-soft);border:0"><p style="color:var(--ink)"><b>${esc(s.reason)}</b></p></div>`:''}
     <div class="card"><h2>Подготовьтесь к проверке знаний без стресса</h2>
@@ -368,12 +371,12 @@ function payView(s){
   bindBack();
   const pm=(t,ok)=>{const m=$('#pm');m.textContent=t;m.className='msg '+(ok?'ok':'err')};
   const busy=b=>document.querySelectorAll('main button').forEach(x=>x.disabled=b);
-  const after=async(tries,fail)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(deviceId());if(j.active){pm('Готово! Полный доступ открыт.',true);setTimeout(home,900);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm(fail||'Оплата пока не подтвердилась. Нажмите «Я уже оплатил» через минуту или напишите на '+SUPPORT)};
-  if($('#buy'))$('#buy').onclick=async()=>{const id=deviceId();
+  const after=async(tries,fail)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(deviceId());if(j.active){ZT('paid');pm('Готово! Полный доступ открыт.',true);setTimeout(home,900);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm(fail||'Оплата пока не подтвердилась. Нажмите «Я уже оплатил» через минуту или напишите на '+SUPPORT)};
+  if($('#buy'))$('#buy').onclick=async()=>{const id=deviceId();ZT('pay_life');
     if(IN_APP){location.href='https://zubrilab.ru/app/pay.html#'+new URLSearchParams({plan:'life',id});return}
     busy(true);try{await payLife(id);await after()}catch(e){if(e.message==='widget')pm('Не удалось открыть форму оплаты. Проверьте интернет.');else await after(3,'Оплата не прошла или отменена. Если деньги списались — нажмите «Я уже оплатил».')}finally{busy(false)}};
   $('#paid').onclick=async()=>{busy(true);try{await after(3)}finally{busy(false)}};
-  $('#cdB').onclick=async()=>{const c=$('#cdIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){LS.set('access',{plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);setTimeout(home,900)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером.')}finally{busy(false)}};
+  $('#cdB').onclick=async()=>{const c=$('#cdIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){ZT('code');LS.set('access',{plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);setTimeout(home,900)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером.')}finally{busy(false)}};
   let ch=null;
   const jpost=async(path,body)=>{const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(_){}j._ok=r.ok;return j};
   $('#rsB').onclick=async()=>{const inp=$('#rsIn');
@@ -416,6 +419,7 @@ function aboutView(s){
 }
 
 /* ================= запуск ================= */
+if(premium())ZT('open_'+access().plan);
 fetch('bank.json?v=2026-09-01-777-7c5c9a38').then(r=>r.json()).then(b=>{BANK=b;render()}).catch(()=>{$('#root').innerHTML='<main><div class="card"><h2>Не удалось загрузить вопросы</h2><p>Обновите страницу.</p></div></main>'});
 </script>
 

@@ -30,6 +30,9 @@ const id=q.get('id')||'', plan=q.get('plan')||'trial';
 /* китайская версия: номер устройства z_…, своё название в чеке */
 const NAME=/^z_/.test(id)?'Зубрила · китайский':/^e_/.test(id)?'Билеты по электробезопасности':'Зубрила';
 const $=x=>document.getElementById(x);
+/* анонимная статистика шагов (без имён и почты): server/stats.js */
+const ZA=/^z_/.test(id)?'zh':/^e_/.test(id)?'elbez':'en';
+function ZT(e){try{const b=JSON.stringify({a:ZA,e:e,u:id||'unknown_id',p:'apk'});if(navigator.sendBeacon&&navigator.sendBeacon('https://silkaalexandr-hub-zubrila-e726.twc1.net/api/ev',new Blob([b],{type:'text/plain'})))return;fetch('https://silkaalexandr-hub-zubrila-e726.twc1.net/api/ev',{method:'POST',body:b,keepalive:true,headers:{'Content-Type':'text/plain'}}).catch(()=>{})}catch(x){}}
 const back=s=>location.replace(BACK+(s?'#'+s:''));
 $('back').onclick=()=>back('paid');
 function receipt(label,price){return{Items:[{label,price,quantity:1,amount:price,vat:null,method:4,object:4}],taxationSystem:1,isBso:false,amounts:{electronic:price}}}
@@ -46,10 +49,11 @@ function opts(){
 async function pay(){
   $('again').hidden=true;$('t').textContent='Открываем оплату…';$('m').textContent='Сейчас появится защищённая форма CloudPayments.';
   try{await load()}catch(e){$('t').textContent='Нет связи';$('m').textContent='Не удалось открыть форму оплаты. Проверьте интернет.';$('again').hidden=false;return}
+  ZT('pay_form_'+plan);
   const [kind,o]=opts();
   new cp.CloudPayments({language:'ru-RU'}).pay(kind,o,{
-    onSuccess:()=>{$('t').textContent='Оплата прошла!';$('m').textContent='Возвращаемся в приложение…';setTimeout(()=>back('paid'),800)},
-    onFail:()=>{$('t').textContent='Оплата не завершена';$('m').textContent='Можно попробовать ещё раз или вернуться в приложение.';$('again').hidden=false}
+    onSuccess:()=>{ZT('pay_ok_'+plan);$('t').textContent='Оплата прошла!';$('m').textContent='Возвращаемся в приложение…';setTimeout(()=>back('paid'),800)},
+    onFail:()=>{ZT('pay_fail_'+plan);$('t').textContent='Оплата не завершена';$('m').textContent='Можно попробовать ещё раз или вернуться в приложение.';$('again').hidden=false}
   });
 }
 $('again').onclick=pay;

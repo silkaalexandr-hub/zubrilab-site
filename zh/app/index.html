@@ -509,6 +509,8 @@ function trim(){
   }
 }
 
+/* анонимная статистика шагов (без имён и почты): server/stats.js */
+const ZT=(()=>{const A='zh',U='https://silkaalexandr-hub-zubrila-e726.twc1.net/api/ev';let id='';try{id=localStorage.getItem('zt_u')||'';if(!id){id='u'+Array.from(crypto.getRandomValues(new Uint8Array(9)),b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('zt_u',id)}}catch(e){}if(!id)id='u'+Math.random().toString(36).slice(2,14);const P=location.hostname==='appassets.androidplatform.net'?'apk':'web';const sent=new Set();const f=function(e){if(sent.has(e))return;sent.add(e);try{const b=JSON.stringify({a:A,e:e,u:id,p:P});if(navigator.sendBeacon&&navigator.sendBeacon(U,new Blob([b],{type:'text/plain'})))return;fetch(U,{method:'POST',body:b,keepalive:true,headers:{'Content-Type':'text/plain'}}).catch(()=>{})}catch(x){}};try{if(!localStorage.getItem('zt_first_'+A)){localStorage.setItem('zt_first_'+A,'1');f('install')}}catch(e){}f('open');return f})();
 /* ---------- доступ: демо-урок → 7 дней с привязкой карты (CloudPayments) → подписка / навсегда ---------- */
 const API='https://silkaalexandr-hub-zubrila-e726.twc1.net';
 const CP_PUBLIC_ID='pk_7f712dd7d48796ce7d6c9a655dd57';
@@ -533,7 +535,7 @@ window.addEventListener('hashchange',()=>{if(/^#(buy|restore)/.test(location.has
 (function(){const a=access();if(a.plan==='life'||(a.plan==='code'&&accessActive())||navigator.onLine===false)return;const was=accessActive();checkAccess(a.email||deviceId()).then(j=>{renderTrial();if(j.active&&!was)location.reload()}).catch(()=>{})})();
 /* возврат из оплаты (Android-приложение): ждём подтверждения и открываем доступ */
 (function(){if(location.hash!=='#paid')return;history.replaceState(null,'',location.pathname);const id=deviceId();let n=0;
-  const t=async()=>{try{const j=await checkAccess(id);if(j.active){location.reload();return}}catch(e){}if(++n<10)setTimeout(t,2500)};setTimeout(t,500)})();
+  const t=async()=>{try{const j=await checkAccess(id);if(j.active){ZT('paid');setTimeout(()=>location.reload(),300);return}}catch(e){}if(++n<10)setTimeout(t,2500)};setTimeout(t,500)})();
 let cpLoaded=null;
 function loadCP(){if(window.cp)return Promise.resolve();if(cpLoaded)return cpLoaded;
   cpLoaded=new Promise((ok,bad)=>{const s=document.createElement('script');s.src='https://widget.cloudpayments.ru/bundles/cloudpayments.js';s.onload=ok;s.onerror=()=>{cpLoaded=null;bad(new Error('widget'))};document.head.appendChild(s)});return cpLoaded}
@@ -573,6 +575,7 @@ function showPaywall(){
     return;
   }
   const a=access(), expired=!!a.email;
+  ZT(expired?'paywall_expired':'paywall');
   $('mode').textContent=expired?'Доступ закончился':(LS.get('zb_demo_done')==='1'?'Демо-урок пройден':'Полный доступ');$('mode').className='mode rev';
   $('cardNum').textContent='';$('wordCount').textContent='';$('pips').innerHTML='';$('sbar').style.width='100%';
   $('answerArea').innerHTML='';$('verdict').textContent='';
@@ -592,15 +595,15 @@ function showPaywall(){
   const pm=(t,ok)=>{$('payMsg').textContent=t;$('payMsg').className='msg '+(ok?'ok':'err')};
   const getEmail=()=>deviceId();
   const busy=b=>{['btnTrial','btnLife','btnCode','btnRs','btnPaid'].forEach(id=>{const x=$(id);if(x)x.disabled=b})};
-  const after=async(email,tries,failMsg)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm(failMsg||'Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
+  const after=async(email,tries,failMsg)=>{pm('Проверяю оплату…',true);for(let i=0;i<(tries||6);i++){try{const j=await checkAccess(email);if(j.active){ZT('paid');pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,600);return}}catch(e){}await new Promise(r=>setTimeout(r,2500))}pm(failMsg||'Оплата пока не подтвердилась. Нажми «Я уже оплатил» через минуту или напиши на support@zubrilab.ru.')};
   const IN_APP=location.hostname==='appassets.androidplatform.net';
-  const run=async fn=>{const e=getEmail();if(!e)return;
+  const run=async fn=>{const e=getEmail();if(!e)return;ZT(fn===payLife?'pay_life':fn===paySub?'pay_sub':'pay_trial');
     if(IN_APP){location.href='https://zubrilab.ru/app/pay.html#'+new URLSearchParams({plan:fn===payLife?'life':fn===paySub?'sub':'trial',id:e});return}
     busy(true);try{await fn(e);await after(e)}catch(err){if(err.message==='widget')pm('Не удалось открыть форму оплаты. Проверь интернет и попробуй ещё раз.');else await after(e,3,'Оплата не прошла или была отменена. Если деньги списались — нажми «Я уже оплатил».')}finally{busy(false)}};
   $('btnPaid').onclick=async()=>{busy(true);try{await after(getEmail(),3)}finally{busy(false)}};
   $('btnTrial').onclick=()=>run(expired?paySub:payTrial);
   $('btnLife').onclick=()=>run(payLife);
-  $('btnCode').onclick=async()=>{const c=$('codeIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){saveAccess({plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,1500)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером. Попробуй ещё раз.')}finally{busy(false)}};
+  $('btnCode').onclick=async()=>{const c=$('codeIn').value.trim();if(!c)return;busy(true);try{const r=await fetch(API+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json();if(j.active){ZT('code');saveAccess({plan:j.plan,until:j.until,token:j.token,exp:j.until});pm('Готово! Доступ открыт.',true);renderTrial();setTimeout(newSession,1500)}else pm('Код не подошёл.')}catch(e){pm('Нет связи с сервером. Попробуй ещё раз.')}finally{busy(false)}};
   let rsCh=null;
   const jpost=async(path,body)=>{const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(_){}j._ok=r.ok;return j};
   const rsSend=async()=>{const e=$('rsIn').value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){pm('Введите почту, которую указывали при покупке.');return}busy(true);pm('Ищу покупку… Это может занять до минуты.',true);try{const j=await jpost('/api/restore/start',{email:e,product:'zh'});if(j.found){rsCh=j.challenge;const i=$('rsIn');i.value='';i.type='text';i.inputMode='numeric';i.autocomplete='one-time-code';i.maxLength=6;i.placeholder='Код из письма';$('btnRs').textContent='Войти';$('rsHint').textContent='Отправили код на '+e+'. Проверьте почту и папку «Спам».';pm('');i.focus()}else if(j.error==='too_many_requests')pm('Слишком много попыток. Попробуйте через час.');else if(j._ok)pm('Покупок на эту почту не нашли. Проверьте адрес или напишите на support@zubrilab.ru.');else pm('Сервис временно недоступен. Попробуйте позже или напишите на support@zubrilab.ru.'+(j.detail?' ('+j.detail+')':''))}catch(_){pm('Нет связи с сервером. Проверьте интернет.')}finally{busy(false)}};
@@ -610,6 +613,7 @@ function showPaywall(){
   const h=location.hash;if(h==='#restore'){history.replaceState(null,'',location.pathname);$('restoreBox').open=true;setTimeout(()=>$('rsIn').focus(),50)}
   else if(/^#buy/.test(h)){history.replaceState(null,'',location.pathname);setTimeout(()=>(h==='#buy-life'?$('btnLife'):$('btnTrial')).click(),50)}
 }
+if(accessActive())ZT('open_'+access().plan);
 function newSession(){
   renderTrial();
   if(needPaywall()){showPaywall();return}
@@ -824,7 +828,8 @@ function toRemedy(it,e){
   e[0]=C;e[1]=0;e[2]=3;e[3]=sessId;e[4]=null;e[5]=0;
   it.kind='C';it.retry=true;it.remedy=3;it.extra=0;it.left+=4;planned+=4;it.due=pos+2;trim();
 }
-function grade(it,right){
+let ztN=0;
+function grade(it,right){ZT('answer');if(++ztN===20)ZT('answer20');
   const T=today(), ds=dayStat(T), i=it.i;
   const e=W[i]?[...W[i]]:[A,0,0,sessId,null,0];
   if(!W[i]){ds[3]++;sess.fresh++}
@@ -909,7 +914,7 @@ function showVerdict(right,k,correct,typo,conf){
 }
 function finish(){
   flush();
-  if(!accessActive())LS.set('zb_demo_done','1');
+  if(!accessActive()){LS.set('zb_demo_done','1');ZT('demo_done')}else ZT('session_done');
   $('sbar').style.width='100%';
   $('mode').textContent='Подход завершён';$('mode').className='mode rev';
   $('cardNum').textContent='';$('wordCount').textContent='';$('pips').innerHTML='';
