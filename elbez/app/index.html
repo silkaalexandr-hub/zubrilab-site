@@ -103,6 +103,10 @@ main{max-width:720px;margin:0 auto;padding-block:16px 120px;padding-left:max(16p
 .big.good{color:var(--good)} .big.bad{color:var(--bad)}
 .rlist{display:flex;flex-direction:column;gap:10px}
 .ritem{border-left:5px solid var(--good)}
+.a.yours{color:var(--bad)}
+.verdict{font-weight:800;letter-spacing:.03em}.verdict.good{color:var(--good)}.verdict.bad{color:var(--bad)}
+.a.right{background:var(--good-bg);color:var(--good);font-size:1.12em;font-weight:700;padding:10px 14px;border-radius:12px;border-left:4px solid var(--good)}
+.a.right b{color:var(--good)}
 .ritem.bad{border-left-color:var(--bad)}
 .ritem .q{font-weight:600;margin:4px 0 8px}
 .ritem .a{font-size:.95rem;margin:2px 0}
@@ -319,10 +323,10 @@ function resultView(s){
     <div class="card"><p class="big ${s.passed?'good':'bad'}">${s.passed?'Экзамен сдан':'Экзамен не сдан'}</p>
       <p>${s.timeUp?'Время вышло. ':''}Ошибок: ${s.errors} из ${qs.length} (допускается ${s.max}).</p></div>
     <div class="rlist">${qs.map((q,k)=>{const a=s.ans[k],ok=a===q.correct;return `<div class="card ritem ${ok?'':'bad'}">
-      <div class="meta"><span class="tag">${esc(q.topic)}</span><span>${ok?'✓ верно':'✗ ошибка'}</span></div>
+      <div class="meta"><span class="tag">${esc(q.topic)}</span><span class="verdict ${ok?'good':'bad'}">${ok?'✓ ВЕРНЫЙ ОТВЕТ':'✗ НЕВЕРНЫЙ ОТВЕТ'}</span></div>
       <p class="q">${esc(q.text)}</p>
-      ${ok?'':`<p class="a"><b>Ваш ответ:</b> ${a==null?'нет ответа':esc(q.options[a])}</p>`}
-      <p class="a"><b>Правильно:</b> ${esc(q.options[q.correct])}</p>
+      ${ok?'':`<p class="a yours"><b>Ваш ответ:</b> ${a==null?'нет ответа':esc(q.options[a])}</p>`}
+      <p class="a right"><b>✓ Правильно:</b> ${esc(q.options[q.correct])}</p>
       ${ok?'':explBlock(q,null)}<button class="link small" data-rep="${esc(q.id)}" style="margin-top:8px">⚑ Заметили ошибку? Дайте знать</button></div>`}).join('')}</div>
     <button class="btn" id="again">Ещё один экзамен</button><button class="btn sec" id="hm">На главный экран</button>
   </main>`;
