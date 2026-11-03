@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /app/pay.html
+
+Sitemap: https://zubrilab.ru/sitemap.xml
